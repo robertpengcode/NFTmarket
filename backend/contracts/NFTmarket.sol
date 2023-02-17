@@ -14,6 +14,7 @@ contract NFTmarket is Ownable, ReentrancyGuard {
     }
 
     uint8 public immutable marketFeePercent;
+    address public immutable marketOwner;
     //sellers to their proceeds
     mapping(address => uint256) private sellersProceeds;
     //nft contract address to token id to listing
@@ -27,6 +28,7 @@ contract NFTmarket is Ownable, ReentrancyGuard {
     event BoughtNFT(address nftContractAddr, uint256 tokenId, address buyer, address seller, uint256 price, uint256 time);
 
     error NFTmarket__NotNftOwner();
+    error NFTmarket__NotMarketOwnerOrSeller();
     error NFTmarket__NotApprovedBySeller();
     error NFTmarket__PriceNotValid();
     error NFTmarket__AlreadyListed();
@@ -40,6 +42,14 @@ contract NFTmarket is Ownable, ReentrancyGuard {
        address nftOwner = IERC721(nftContractAddr).ownerOf(tokenId);
        if (nftOwner != msg.sender) {
         revert NFTmarket__NotNftOwner();
+       }
+        _;
+    }
+
+    modifier marketOwnerOrSeller(address nftContractAddr, uint256 tokenId) {
+       address seller = listings[nftContractAddr][tokenId].seller;
+       if (msg.sender != seller && msg.sender != marketOwner ) {
+        revert NFTmarket__NotMarketOwnerOrSeller();
        }
         _;
     }
@@ -59,9 +69,11 @@ contract NFTmarket is Ownable, ReentrancyGuard {
     }
 
     constructor(uint8 _marketFeePercent) {
+        marketOwner = msg.sender;
         marketFeePercent = _marketFeePercent;
     }
 
+    //seller must own the NFT; only seller can list his/her NFT
     function listNFT(address nftContractAddr, uint256 tokenId, uint256 price) external ownedBySeller(nftContractAddr, tokenId) notListed(nftContractAddr, tokenId) {
         if (price <= 0) {
             revert NFTmarket__PriceNotValid();
@@ -91,7 +103,8 @@ contract NFTmarket is Ownable, ReentrancyGuard {
         emit BoughtNFT(nftContractAddr, tokenId, msg.sender, seller, price, block.timestamp);
     }
 
-    function updateListingPrice(address nftContractAddr, uint256 tokenId, uint256 newPrice) external isListed(nftContractAddr, tokenId){
+    //seller must own the NFT; only seller can update the listing price of his/her NFT
+    function updateListingPrice(address nftContractAddr, uint256 tokenId, uint256 newPrice) external isListed(nftContractAddr, tokenId) ownedBySeller(nftContractAddr, tokenId){
         if (newPrice <= 0) {
             revert NFTmarket__PriceNotValid();
         }
@@ -99,7 +112,8 @@ contract NFTmarket is Ownable, ReentrancyGuard {
         emit UpdatedListingPrice(nftContractAddr, tokenId, newPrice, block.timestamp);
     }
 
-    function deleteListing(address nftContractAddr, uint256 tokenId) external isListed(nftContractAddr, tokenId) {
+    //both seller and market contract owner can delete a listing
+    function deleteListing(address nftContractAddr, uint256 tokenId) external isListed(nftContractAddr, tokenId) marketOwnerOrSeller(nftContractAddr, tokenId){
         delete listings[nftContractAddr][tokenId];
         emit DeletedListing(nftContractAddr, tokenId, block.timestamp);
     }
