@@ -6,15 +6,26 @@ const { developmentChains } = require("../helper-hardhat-config");
   ? describe.skip
   : describe("NFTmarket", function () {
       let owner, user1, user2, user3, user4, nftmarket, testNFT, testPrice;
+      const emptyAddress = "0x0000000000000000000000000000000000000000";
       before(async () => {
         [owner, user1, user2, user3, user4] = await ethers.getSigners();
         testPrice = ethers.utils.parseEther("0.001");
+        testWithdraw = ethers.utils.parseEther("0.00001");
         const NFTmarket = await ethers.getContractFactory("NFTmarket");
+        //2% market fee
         nftmarket = await NFTmarket.deploy(2);
         await nftmarket.deployed();
+
         const TestNFT = await ethers.getContractFactory("TestNFT");
         testNFT = await TestNFT.deploy();
         await testNFT.deployed();
+
+        const BoredStudentsNFT = await ethers.getContractFactory(
+          "BoredStudentsNFT"
+        );
+        boredStudentsNFT = await BoredStudentsNFT.deploy(0, 50, 5, 1679665400);
+        await boredStudentsNFT.deployed();
+
         await testNFT.safeMint(user1.address, "test nft1 uri");
         await testNFT.safeMint(user2.address, "test nft2 uri");
         await testNFT.connect(user1).approve(nftmarket.address, 0);
@@ -23,7 +34,7 @@ const { developmentChains } = require("../helper-hardhat-config");
       describe("Deployment; safeMint; approve", () => {
         describe("NFTmarket", () => {
           it("Should set up market owner", async () => {
-            expect(await nftmarket.marketOwner()).to.equal(owner.address);
+            expect(await nftmarket.owner()).to.equal(owner.address);
           });
           it("Should set up market fee percent", async () => {
             expect((await nftmarket.marketFeePercent()).toString()).to.equal(
@@ -44,6 +55,159 @@ const { developmentChains } = require("../helper-hardhat-config");
           it("User1 should approve the NFT market", async () => {
             expect(await testNFT.getApproved(0)).to.equal(nftmarket.address);
           });
+        });
+      });
+
+      describe("Update Market Fee", () => {
+        it("Should not update market fee - not market owner", async () => {
+          await expect(
+            nftmarket.connect(user1).updateMarketFee(3)
+          ).to.be.revertedWith("Ownable: caller is not the owner");
+        });
+
+        it("Should update market fee", async () => {
+          await nftmarket.updateMarketFee(3);
+          expect(await nftmarket.marketFeePercent()).to.equal(3);
+        });
+      });
+
+      describe("Create Collection", () => {
+        it("Should not create collection - not market owner", async () => {
+          await expect(
+            nftmarket
+              .connect(user1)
+              .createCollection(
+                testNFT.address,
+                testNFT.owner(),
+                2,
+                "test collection uri"
+              )
+          ).to.be.revertedWith("Ownable: caller is not the owner");
+        });
+
+        it("Should create collection - event CreatedCollection", async () => {
+          await expect(
+            nftmarket.createCollection(
+              testNFT.address,
+              testNFT.owner(),
+              2,
+              "test collection uri"
+            )
+          ).to.emit(nftmarket, "CreatedCollection");
+        });
+
+        it("Should not create collection - created already", async () => {
+          await expect(
+            nftmarket.createCollection(
+              testNFT.address,
+              testNFT.owner(),
+              2,
+              "test collection uri"
+            )
+          ).to.be.revertedWithCustomError(
+            nftmarket,
+            "NFTmarket__CollectionAlreadyCreated"
+          );
+        });
+
+        it("Should - set royalty address, percent, uri", async () => {
+          expect((await nftmarket.getCollection(testNFT.address))[0]).to.equal(
+            await testNFT.owner()
+          );
+          expect((await nftmarket.getCollection(testNFT.address))[1]).to.equal(
+            2
+          );
+          expect((await nftmarket.getCollection(testNFT.address))[2]).to.equal(
+            "test collection uri"
+          );
+        });
+      });
+
+      describe("Update Collection", () => {
+        it("Should not update collection - not market owner", async () => {
+          await expect(
+            nftmarket
+              .connect(user1)
+              .updateCollection(
+                testNFT.address,
+                user3.address,
+                3,
+                "test collection uri updated"
+              )
+          ).to.be.revertedWith("Ownable: caller is not the owner");
+        });
+
+        it("Should not update collection - collection does not exist", async () => {
+          await expect(
+            nftmarket.updateCollection(
+              boredStudentsNFT.address,
+              user3.address,
+              3,
+              "test collection uri updated"
+            )
+          ).to.be.revertedWithCustomError(
+            nftmarket,
+            "NFTmarket__CollectionNotCreated"
+          );
+        });
+
+        it("Should update collection - event UpdatedCollection", async () => {
+          await expect(
+            nftmarket.updateCollection(
+              testNFT.address,
+              user3.address,
+              3,
+              "test collection uri updated"
+            )
+          ).to.emit(nftmarket, "UpdatedCollection");
+        });
+
+        it("Should - update royalty address, percent, uri", async () => {
+          expect((await nftmarket.getCollection(testNFT.address))[0]).to.equal(
+            user3.address
+          );
+          expect((await nftmarket.getCollection(testNFT.address))[1]).to.equal(
+            3
+          );
+          expect((await nftmarket.getCollection(testNFT.address))[2]).to.equal(
+            "test collection uri updated"
+          );
+        });
+      });
+
+      describe("Delete Collection", () => {
+        it("Should not delete collection - not market owner", async () => {
+          await expect(
+            nftmarket.connect(user1).deleteCollection(testNFT.address)
+          ).to.be.revertedWith("Ownable: caller is not the owner");
+        });
+
+        it("Should not delete collection - collection does not exist", async () => {
+          await expect(
+            nftmarket.deleteCollection(boredStudentsNFT.address)
+          ).to.be.revertedWithCustomError(
+            nftmarket,
+            "NFTmarket__CollectionNotCreated"
+          );
+        });
+
+        it("Should delete collection - event DeletedCollection", async () => {
+          await expect(nftmarket.deleteCollection(testNFT.address)).to.emit(
+            nftmarket,
+            "DeletedCollection"
+          );
+        });
+
+        it("Should - update royalty address, percent, uri", async () => {
+          expect((await nftmarket.getCollection(testNFT.address))[0]).to.equal(
+            emptyAddress
+          );
+          expect((await nftmarket.getCollection(testNFT.address))[1]).to.equal(
+            0
+          );
+          expect((await nftmarket.getCollection(testNFT.address))[2]).to.equal(
+            ""
+          );
         });
       });
 
@@ -93,18 +257,30 @@ const { developmentChains } = require("../helper-hardhat-config");
       });
 
       describe("Buy NFT", () => {
+        let marketFeePercent;
+        let royalty;
+        before(async () => {
+          marketFeePercent = await nftmarket.marketFeePercent();
+          await nftmarket.createCollection(
+            testNFT.address,
+            testNFT.owner(),
+            2,
+            "test collection uri"
+          );
+          royalty = (await nftmarket.getCollection(testNFT.address))[1];
+        });
         it("Should not buy NFT - not listed", async () => {
           await expect(
-            nftmarket
-              .connect(user3)
-              .buyNFT(testNFT.address, 1, { value: testPrice })
+            nftmarket.connect(user3).buyNFT(testNFT.address, 1, {
+              value: testPrice * (1 + (marketFeePercent + royalty) / 100),
+            })
           ).to.be.revertedWithCustomError(nftmarket, "NFTmarket__NotListed");
         });
         it("Should not buy NFT - sent wrong value", async () => {
           await expect(
             nftmarket
               .connect(user3)
-              .buyNFT(testNFT.address, 0, { value: testPrice - 1000 })
+              .buyNFT(testNFT.address, 0, { value: testPrice })
           ).to.be.revertedWithCustomError(
             nftmarket,
             "NFTmarket__SentWrongValue"
@@ -112,9 +288,9 @@ const { developmentChains } = require("../helper-hardhat-config");
         });
         it("Should buy NFT - event BoughtNFT", async () => {
           await expect(
-            nftmarket
-              .connect(user3)
-              .buyNFT(testNFT.address, 0, { value: testPrice })
+            nftmarket.connect(user3).buyNFT(testNFT.address, 0, {
+              value: testPrice * (1 + (marketFeePercent + royalty) / 100),
+            })
           ).to.emit(nftmarket, "BoughtNFT");
         });
         it("Should has a new owner", async () => {
@@ -129,8 +305,8 @@ const { developmentChains } = require("../helper-hardhat-config");
           ).to.equal("0x00000");
         });
         it("Should update seller's proceed", async () => {
-          expect(await nftmarket.getSellerProceed(user1.address)).to.equal(
-            ((testPrice * 98) / 100).toString()
+          expect(await nftmarket.getUserProceed(user1.address)).to.equal(
+            testPrice.toString()
           );
         });
       });
@@ -209,52 +385,57 @@ const { developmentChains } = require("../helper-hardhat-config");
       describe("Seller Withdraw", () => {
         it("Should not withdraw proceed - no balance", async () => {
           await expect(
-            nftmarket.connect(user2).sellerWithdraw()
+            nftmarket.connect(user2).usersWithdraw()
           ).to.be.revertedWithCustomError(nftmarket, "NFTmarket__NoBalance");
         });
         // it("Seller should withdraw proceed - event SellerWithdrew", async () => {
-        //   await expect(nftmarket.connect(user1).sellerWithdraw()).to.emit(
+        //   await expect(nftmarket.connect(user1).usersWithdraw()).to.emit(
         //     nftmarket,
-        //     "SellerWithdrew"
+        //     "UserWithdrew"
         //   );
         // });
         it("Seller should withdraw proceed - account balances changed", async () => {
-          const change = (testPrice * 98) / 100;
+          const change = testPrice;
           await expect(
-            nftmarket.connect(user1).sellerWithdraw()
+            nftmarket.connect(user1).usersWithdraw()
           ).to.changeEtherBalances(
             [nftmarket.address, user1],
             [-change, change]
           );
         });
         it("Should set seller's proceed to 0", async () => {
-          expect(await nftmarket.getSellerProceed(user1.address)).to.equal(0);
+          expect(await nftmarket.getUserProceed(user1.address)).to.equal(0);
         });
       });
 
       describe("Market Owner Withdraw", () => {
         it("Should not withdraw - not market owner", async () => {
           await expect(
-            nftmarket.connect(user1).marketOwnerWithdraw()
+            nftmarket.connect(user1).ownerWithdrawFee(testWithdraw)
           ).to.be.revertedWith("Ownable: caller is not the owner");
         });
-        // it("Seller should withdraw proceed - event MarketOwnerWithdrew", async () => {
-        //   await expect(nftmarket.marketOwnerWithdraw()).to.emit(
-        //     nftmarket,
-        //     "MarketOwnerWithdrew"
-        //   );
-        // });
+        it("Market owner should withdraw proceed - event MarketOwnerWithdrew", async () => {
+          await expect(nftmarket.ownerWithdrawFee(testWithdraw)).to.emit(
+            nftmarket,
+            "MarketOwnerWithdrew"
+          );
+        });
         it("Should withdraw balance - account balances changed", async () => {
-          const change = (testPrice * 2) / 100;
-          await expect(nftmarket.marketOwnerWithdraw()).to.changeEtherBalances(
+          const change = testWithdraw;
+          await expect(
+            nftmarket.ownerWithdrawFee(testWithdraw)
+          ).to.changeEtherBalances(
             [nftmarket.address, owner.address],
             [-change, change]
           );
         });
         it("Should not withdraw proceed - no balance", async () => {
           await expect(
-            nftmarket.marketOwnerWithdraw()
-          ).to.be.revertedWithCustomError(nftmarket, "NFTmarket__NoBalance");
+            nftmarket.ownerWithdrawFee(testPrice)
+          ).to.be.revertedWithCustomError(
+            nftmarket,
+            "NFTmarket__NotEnoughBalance"
+          );
         });
       });
     });

@@ -17,7 +17,7 @@ export default function SellNFT() {
     const getSellerBalance = async () => {
       if (contract) {
         const _sellerBalance = (
-          await contract.getSellerProceed(walletAddress)
+          await contract.getUserProceed(walletAddress)
         ).toString();
         setSellerBalance(_sellerBalance);
       }
