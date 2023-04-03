@@ -71,7 +71,7 @@ module.exports = {
       saveDeployments: true,
       chainId: 137,
     },
-    mumbai: {
+    polygonMumbai: {
       url: ALCHEMY_MUMBAI_RPC_URL,
       accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
       saveDeployments: true,
@@ -83,6 +83,7 @@ module.exports = {
     apiKey: {
       goerli: ETHERSCAN_API_KEY,
       polygon: POLYGONSCAN_API_KEY,
+      polygonMumbai: POLYGONSCAN_API_KEY,
     },
   },
   gasReporter: {

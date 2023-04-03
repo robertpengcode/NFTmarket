@@ -1,6 +1,8 @@
+import { ethers } from "ethers";
 import styles from "@/styles";
 import { useEffect, useState } from "react";
 import { useGlobalContext } from "../context";
+import UserWithdraw from "@/components/UserWithdraw";
 
 export default function SellNFT() {
   const { contract, walletAddress, collections } = useGlobalContext();
@@ -9,31 +11,21 @@ export default function SellNFT() {
   const [tokenId, setTokenId] = useState("");
   const [price, setPrice] = useState("");
   const [selectTabId, setSelectTabId] = useState("0");
-  const [sellerBalance, setSellerBalance] = useState("0");
 
-  //console.log("ck", sellerBalance);
+  console.log("what?", collections);
 
-  useEffect(() => {
-    const getSellerBalance = async () => {
-      if (contract) {
-        const _sellerBalance = (
-          await contract.getUserProceed(walletAddress)
-        ).toString();
-        setSellerBalance(_sellerBalance);
-      }
-    };
-    getSellerBalance();
-  }, []);
+  const collectionNamesArr = collections
+    ? collections.map((collection) => collection.name)
+    : [];
 
-  const collectionNamesArr = collections.map((collection) => collection.name);
   const collectionNameOptions = [
     "--choose a collection--",
     ...collectionNamesArr,
     "Others",
   ];
-  const collectionAddrsArr = collections.map(
-    (collection) => collection.address
-  );
+  const collectionAddrsArr = collections
+    ? collections.map((collection) => collection.address)
+    : [];
 
   const convertAddress = (addr) => {
     return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
@@ -49,23 +41,6 @@ export default function SellNFT() {
     }
   };
 
-  //const sellerBalance = 2;
-
-  const handleSubmitSell = async () => {
-    console.log("submit sell!!");
-    if (selectTabId === "0") {
-      console.log("run list!");
-    } else if (selectTabId === "1") {
-      console.log("run update!");
-    } else if (selectTabId === "2") {
-      console.log("run cancel!");
-    } else if (selectTabId === "3") {
-      console.log("run withdraw!");
-    }
-    setTokenId("");
-    setPrice("");
-  };
-
   const handleTab = (e) => {
     setSelectTabId(e.target.id);
   };
@@ -78,15 +53,63 @@ export default function SellNFT() {
       case "2":
         return "Cancel Listing";
         break;
-      case "3":
-        return "Withdraw Proceed";
-        break;
       default:
         return "List NFT";
     }
   };
 
   const buttonText = buttonTextFunc();
+
+  const handleSubmitSell = () => {
+    console.log("submit sell!!");
+    if (selectTabId === "0") {
+      approveAndList();
+    } else if (selectTabId === "1") {
+      updateList();
+    } else if (selectTabId === "2") {
+      cancelList();
+    }
+    setCollectionName("");
+    setCollectionAddr("");
+    setTokenId("");
+    setPrice("");
+  };
+
+  //nft contract 0xE3fca70EF8B81112E2386ECb490De51BF459c299
+  const approveAndList = async () => {
+    console.log("create list!");
+    const priceInWei = ethers.parseEther(price);
+    if (contract) {
+      try {
+        await contract.listNFT(collectionAddr, tokenId, priceInWei);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const updateList = async () => {
+    console.log("update list!");
+    const priceInWei = ethers.parseEther(price);
+    if (contract) {
+      try {
+        await contract.updateListingPrice(collectionAddr, tokenId, priceInWei);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const cancelList = async () => {
+    console.log("cancel list!");
+    if (contract) {
+      try {
+        await contract.deleteListing(collectionAddr, tokenId);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
   return (
     <div className={styles.pageContainer}>
@@ -126,90 +149,82 @@ export default function SellNFT() {
             Withdraw Proceed
           </div>
         </div>
-        <form
-          className={styles.sellFormContainer}
-          onSubmit={(event) => {
-            event.preventDefault();
-            handleSubmitSell();
-          }}
-        >
-          {selectTabId === "3" ? (
-            <div className="flex flex-row my-2">
-              <p className={styles.sellFormLabel}>
-                Seller({showWalletAddress})'s Proceed Balance :{" "}
-              </p>
-              <p className={styles.sellFormLabel}>
-                {sellerBalance ? sellerBalance : "0"}
-              </p>
-            </div>
-          ) : (
-            <>
-              <label htmlFor="collectionName" className={styles.sellFormLabel}>
-                Choose a Collection:
-              </label>
-              <select
-                name="collectionName"
-                id="collectionName"
-                value={collectionName}
-                className={styles.sellFormInput}
-                onChange={(e) => {
-                  setCollectionName(e.target.value);
-                  handleCollectionAddr(e.target.value);
-                }}
-              >
-                {collectionNameOptions.map((option, id) => (
-                  <option key={id} value={option} className="">
-                    {option}
-                  </option>
-                ))}
-              </select>
-              <label htmlFor="contractAddr" className={styles.sellFormLabel}>
-                Collection Contract Address:
-              </label>
-              <input
-                type="text"
-                name="contractAddr"
-                id="contractAddr"
-                placeholder="input collection contract address"
-                className={styles.sellFormInput}
-                value={collectionAddr}
-                onChange={(e) => setCollectionAddr(e.target.value)}
-              />
-              <label htmlFor="tokenId" className={styles.sellFormLabel}>
-                NFT Token ID:
-              </label>
-              <input
-                type="text"
-                name="tokenId"
-                id="tokenId"
-                placeholder=" input NFT token id"
-                className={styles.sellFormInput}
-                value={tokenId}
-                onChange={(e) => setTokenId(e.target.value)}
-              />
-              {selectTabId !== "2" && (
-                <>
-                  <label htmlFor="sellPrice" className={styles.sellFormLabel}>
-                    Price:
-                  </label>
-                  <input
-                    type="text"
-                    name="sellPrice"
-                    id="sellPrice"
-                    placeholder=" input sell price"
-                    className={styles.sellFormInput}
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                  />
-                </>
-              )}
-            </>
-          )}
 
-          <button type="submit" className={styles.sellFormButton}>
-            {buttonText}
-          </button>
-        </form>
+        {selectTabId === "3" ? (
+          <UserWithdraw />
+        ) : (
+          <form
+            className={styles.sellFormContainer}
+            onSubmit={(event) => {
+              event.preventDefault();
+              handleSubmitSell();
+            }}
+          >
+            <label htmlFor="collectionName" className={styles.sellFormLabel}>
+              Choose a Collection:
+            </label>
+            <select
+              name="collectionName"
+              id="collectionName"
+              value={collectionName}
+              className={styles.sellFormInput}
+              onChange={(e) => {
+                setCollectionName(e.target.value);
+                handleCollectionAddr(e.target.value);
+              }}
+            >
+              {collectionNameOptions.map((option, id) => (
+                <option key={id} value={option} className="">
+                  {option}
+                </option>
+              ))}
+            </select>
+            <label htmlFor="contractAddr" className={styles.sellFormLabel}>
+              Collection Contract Address:
+            </label>
+            <input
+              type="text"
+              name="contractAddr"
+              id="contractAddr"
+              placeholder="input collection contract address"
+              className={styles.sellFormInput}
+              value={collectionAddr}
+              onChange={(e) => setCollectionAddr(e.target.value)}
+            />
+            <label htmlFor="tokenId" className={styles.sellFormLabel}>
+              NFT Token ID:
+            </label>
+            <input
+              type="text"
+              name="tokenId"
+              id="tokenId"
+              placeholder=" input NFT token id"
+              className={styles.sellFormInput}
+              value={tokenId}
+              onChange={(e) => setTokenId(e.target.value)}
+            />
+            {selectTabId !== "2" && (
+              <>
+                <label htmlFor="sellPrice" className={styles.sellFormLabel}>
+                  Price in Matic:
+                </label>
+                <input
+                  type="text"
+                  name="sellPrice"
+                  id="sellPrice"
+                  placeholder=" input sell price in Matic"
+                  className={styles.sellFormInput}
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                />
+              </>
+            )}
+
+            <button type="submit" className={styles.sellFormButton}>
+              {buttonText}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );

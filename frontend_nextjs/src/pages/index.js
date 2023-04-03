@@ -1,56 +1,20 @@
 import Head from "next/head";
-import Image from "next/image";
-import Link from "next/link";
+
 //import { useRouter } from "next/router";
-import url1 from "../assets/Karen.png";
 import styles from "@/styles";
 import { useGlobalContext } from "../context";
+import { useSubgraph } from "@/hooks/subgraph";
+import CollectionRow from "../components/CollectionRow";
 
 export default function Home() {
-  const { contract, walletAddress, collections } = useGlobalContext();
-  //console.log("co", collections);
+  const { contract, walletAddress } = useGlobalContext();
+  const { loading, error, data } = useSubgraph();
 
-  // function getRows(_collectionsArr) {
-  //   const _rows = [];
-  //   for (let i = 0; i < _collectionsArr.length; i++) {
-  //     let obj = {};
-  //     obj.key = `${i + 1}`;
-  //     obj.collection = collections[i].name;
-  //     obj.by = collections[i].team;
-  //     obj.floorPrice = "0.01 ETH";
-  //     obj.supply = collections[i].supply;
-  //     _rows.push(obj);
-  //   }
-  //   //console.log("chi", _rows);
-  //   return _rows;
+  const collectionsArr = data ? data.createdCollections : null;
+
+  // if (data) {
+  //   console.log("data", data.createdCollections);
   // }
-
-  //const rows = getRows(collections);
-  // console.log("r", rows);
-
-  const rows = [
-    {
-      key: "1",
-      collection: "Friends",
-      by: "NOZO_ART",
-      floorPrice: "0.01 ETH",
-      supply: "10",
-    },
-    {
-      key: "2",
-      collection: "Bored Kids",
-      by: "NOZO_ART",
-      floorPrice: "0.01 ETH",
-      supply: "100",
-    },
-    {
-      key: "3",
-      collection: "Crypto Robots",
-      by: "COOLDAD",
-      floorPrice: "0.01 ETH",
-      supply: "50",
-    },
-  ];
 
   return (
     <>
@@ -73,37 +37,61 @@ export default function Home() {
               <div className={styles.homeCollectionRowItem}>Floor Price</div>
               <div className={styles.homeCollectionRowItem}>Supply</div>
             </div>
-            {rows.map((row, id) => (
-              <Link
-                key={id}
-                className={styles.homeCollectionRow}
-                // href={{
-                //   pathname: "/listings/[collection]",
-                //   query: { collection: `${row.collection}` },
-                // }}
-                href="/listings"
-                //href={`/listings/${row.collection}`}
-              >
-                <div className={styles.homeCollectionRowItem}>
-                  {row.collection}
-                </div>
-                <div className={styles.homeCollectionRowItem}>
-                  <Image
-                    src={url1}
-                    alt="collection image"
-                    className={styles.homeCollectionImg}
-                  />
-                </div>
-                <div className={styles.homeCollectionRowItem}>{row.by}</div>
-                <div className={styles.homeCollectionRowItem}>
-                  {row.floorPrice}
-                </div>
-                <div className={styles.homeCollectionRowItem}>{row.supply}</div>
-              </Link>
-            ))}
+
+            {loading ? (
+              <div>Loading...</div>
+            ) : !collectionsArr ? (
+              <div>No Collections</div>
+            ) : (
+              collectionsArr.map((collection, id) => (
+                <CollectionRow key={id} collection={collection} />
+              ))
+            )}
           </div>
         </div>
       </div>
     </>
   );
 }
+
+// function getRows(_collectionsArr) {
+//   const _rows = [];
+//   for (let i = 0; i < _collectionsArr.length; i++) {
+//     let obj = {};
+//     obj.key = `${i + 1}`;
+//     obj.collection = collections[i].name;
+//     obj.by = collections[i].team;
+//     obj.floorPrice = "0.01 ETH";
+//     obj.supply = collections[i].supply;
+//     _rows.push(obj);
+//   }
+//   //console.log("chi", _rows);
+//   return _rows;
+// }
+
+//const rows = data ? getRows(data.createdCollections) : null;
+// console.log("r", rows);
+
+// const rows = [
+//   {
+//     key: "1",
+//     collection: "Friends",
+//     by: "NOZO_ART",
+//     floorPrice: "0.01 ETH",
+//     supply: "10",
+//   },
+//   {
+//     key: "2",
+//     collection: "Bored Kids",
+//     by: "NOZO_ART",
+//     floorPrice: "0.01 ETH",
+//     supply: "100",
+//   },
+//   {
+//     key: "3",
+//     collection: "Crypto Robots",
+//     by: "COOLDAD",
+//     floorPrice: "0.01 ETH",
+//     supply: "50",
+//   },
+// ];

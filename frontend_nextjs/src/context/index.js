@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { ethers } from "ethers";
-import { ABI, ADDRESS } from "../contract";
-import { collections, boredStudentsAttributes } from "@/devData";
+import { marketABI, marketAddress } from "../contract";
+import { boredStudentsAttributes } from "@/devData";
+
+//import { useSubgraph } from "@/hooks/subgraph";
 
 const GlobalContext = createContext();
 
@@ -10,6 +12,9 @@ export const GlobalContextProvider = ({ children }) => {
   const [walletAddress, setWalletAddress] = useState("");
   const [walletBalance, setWalletBalance] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [provider, setProvider] = useState(null);
+
+  //const { loading, error, data } = useSubgraph();
 
   //* Set the wallet address to the state
   const updateAddress = async (accounts) => {
@@ -28,11 +33,12 @@ export const GlobalContextProvider = ({ children }) => {
         await newProvider.getBalance(accounts[0])
       ).toString();
       const balanceInETH = ethers.formatEther(balance);
-      console.log("balance", balanceInETH);
+      //console.log("balance", balanceInETH);
       setWalletBalance(balanceInETH);
       const signer = await newProvider.getSigner();
-      const newContract = new ethers.Contract(ADDRESS, ABI, signer);
+      const newContract = new ethers.Contract(marketAddress, marketABI, signer);
       setContract(newContract);
+      setProvider(newProvider);
       const owner = (await newContract.owner()).toLowerCase();
       const isAdmin = owner === accounts[0];
       setIsAdmin(isAdmin);
@@ -48,9 +54,9 @@ export const GlobalContextProvider = ({ children }) => {
     //console.log("balance", balanceInETH);
     setWalletBalance(balanceInETH);
     const signer = await newProvider.getSigner();
-    const newContract = new ethers.Contract(ADDRESS, ABI, signer);
+    const newContract = new ethers.Contract(marketAddress, marketABI, signer);
     setContract(newContract);
-    //setProvider(newProvider);
+    setProvider(newProvider);
     const owner = (await newContract.owner()).toLowerCase();
     const isAdmin = owner === account;
     setIsAdmin(isAdmin);
@@ -65,12 +71,12 @@ export const GlobalContextProvider = ({ children }) => {
         await newProvider.getBalance(accounts[0])
       ).toString();
       const balanceInETH = ethers.formatEther(balance);
-      console.log("balance", balanceInETH);
+      //console.log("balance", balanceInETH);
       setWalletBalance(balanceInETH);
       const signer = await newProvider.getSigner();
       window.localStorage.setItem("connected", accounts[0]);
-      const newContract = new ethers.Contract(ADDRESS, ABI, signer);
-      //setProvider(newProvider);
+      const newContract = new ethers.Contract(marketAddress, marketABI, signer);
+      setProvider(newProvider);
       setContract(newContract);
       const owner = (await newContract.owner()).toLowerCase();
       const isAdmin = owner === accounts[0];
@@ -103,8 +109,8 @@ export const GlobalContextProvider = ({ children }) => {
         walletBalance,
         connectWallet,
         isAdmin,
-        collections,
         boredStudentsAttributes,
+        provider,
       }}
     >
       {children}

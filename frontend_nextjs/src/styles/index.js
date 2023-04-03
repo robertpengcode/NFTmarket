@@ -40,9 +40,9 @@ const styles = {
   cardContainer:
     "flex flex-col w-[200px] h-[320px] items-center rounded-lg overflow-hidden shadow-lg mx-2 my-2 pb-2 bg-white hover:border-2 hover:border-sitePurple",
   cardImage: "w-full",
-  cardText: "font-righteous my-1",
+  cardText: "font-righteous mb-1",
   cardButton:
-    "font-righteous rounded-md bg-sitePurple hover:bg-purple-500 w-fit text-white p-1 my-1 cursor-pointer",
+    "font-righteous rounded-md bg-sitePurple hover:bg-purple-500 w-fit text-white p-1 mb-1 cursor-pointer",
 
   // Listing page
   listContainer: "flex flex-col flex-wrap p-4",
@@ -88,7 +88,7 @@ const styles = {
 
   // Forms on Sell-NFT page
   sellContainer:
-    "flex flex-col font-righteous mt-2 m-2 p-2 rounded-lg bg-white w-[60%] shadow-md",
+    "flex flex-col font-righteous mt-2 m-2 p-2 rounded-lg bg-white w-[70%] shadow-md",
   sellTabsBox: "flex flex-row m-1",
   sellTab:
     "text-1xl border-b-[3px] mr-4 my-1 p-1 cursor-pointer hover:bg-purple-200 hover:rounded-t-md",

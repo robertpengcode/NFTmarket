@@ -37,4 +37,7 @@ const boredStudentsAttributes = {
   clothing: ["tie", "shirt", "polo", "jersey"],
 };
 
+const boredStudentsURI =
+  '"name":"Bored Students","address":"0xE3fca70EF8B81112E2386ECb490De51BF459c299","royaltyAddr":"0xC8e5a1d3ADfF41B662aaf834BA11B95660A6c86b","royaltyPercent":"2","websiteURL":"https://github.com/robertpengcode/NFTmarket","iconURL":"https://ipfs.io/ipfs/QmdPdwQQewcU5A4hFeovTeZU1HPcZy7m7hB6p3xemEJhu9?filename=boredLogo.png","bannerURL":"https://ipfs.io/ipfs/QmWw8UMBNUBKStWFeT8i8yfVnZk6dMPBCEJG765Bxoge4x?filename=boredBanner.png","description":"bbbbbbbb","attributes":["background","clothing","eyes","face","hair","mouth"],"maxSupply":"50","team":"COOLDAD"';
+
 module.exports = { collections, boredStudentsAttributes };

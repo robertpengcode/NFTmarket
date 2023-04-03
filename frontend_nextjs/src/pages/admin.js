@@ -1,35 +1,32 @@
 import styles from "@/styles";
 import { useState, useEffect } from "react";
 import { useGlobalContext } from "../context";
-//import Button from "react-bootstrap/Button";
-//import Form from "react-bootstrap/Form";
-//import Container from "react-bootstrap/Container";
+import OwnerWithdraw from "../components/OwnerWithdraw";
+//import { storeMetadata } from "../../utils/uploadToPinata";
 
 export default function Admin() {
   const { contract, walletAddress, isAdmin } = useGlobalContext();
   const [selectTabId, setSelectTabId] = useState("0");
   const [collectionName, setCollectionName] = useState("");
   const [collectionAddr, setCollectionAddr] = useState("");
+  const [royaltyAddr, setRoyaltyAddr] = useState("");
+  const [royaltyPercent, setRoyaltyPercent] = useState("");
   const [collectionURL, setCollectionURL] = useState("");
+  const [websiteURL, setWebsiteURL] = useState("");
+  const [iconURL, setIconURL] = useState("");
+  const [bannerURL, setBannerURL] = useState("");
   const [collectionDes, setCollectionDes] = useState("");
-  const [collectionSupply, setCollectionSupply] = useState("");
-  const [collectionTeam, setCollectionTeam] = useState("");
-  const [ownerBalance, setOwnerBalance] = useState("0");
-
-  useEffect(() => {
-    const getOwnerBalance = async () => {
-      if (contract) {
-        const _ownerBalance = (await contract.getContractBalance()).toString();
-        setOwnerBalance(_ownerBalance);
-      }
-    };
-    getOwnerBalance();
-  }, []);
+  const [attributes, setAttributes] = useState("");
+  const [maxSupply, setMaxSupply] = useState("");
+  const [team, setTeam] = useState("");
+  const [collectionJason, setCollectionJason] = useState("");
 
   const convertAddress = (addr) => {
     return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
   };
   const showWalletAddress = walletAddress ? convertAddress(walletAddress) : "";
+
+  //const handleSubmitSell = async () => {};
 
   const handleTab = (e) => {
     setSelectTabId(e.target.id);
@@ -38,10 +35,16 @@ export default function Admin() {
   const buttonTextFunc = () => {
     switch (selectTabId) {
       case "1":
-        return "Withdraw Balance";
+        return "Create Collection";
+        break;
+      case "2":
+        return "Update Collection";
+        break;
+      case "3":
+        return "Cancel Collection";
         break;
       default:
-        return "Create Collection";
+        return "Get Jason";
     }
   };
 
@@ -76,37 +79,101 @@ export default function Admin() {
   //       });
   //   };
 
-  const handleSubmitCollection = async () => {
-    console.log("submit!!");
+  const handleSubmitCollection = () => {
+    //console.log("submit collection!!");
+    if (selectTabId === "0") {
+      inputInfo();
+    } else if (selectTabId === "1") {
+      createCollection();
+    } else if (selectTabId === "2") {
+      updateCollection();
+    } else if (selectTabId === "3") {
+      deleteCollection();
+    }
+
     setCollectionName("");
     setCollectionAddr("");
-    setCollectionURL("");
+    setRoyaltyAddr("");
+    setRoyaltyPercent("");
+    setWebsiteURL("");
+    setIconURL("");
+    setBannerURL("");
     setCollectionDes("");
-    setCollectionSupply("");
-    setCollectionTeam("");
-    // handleBattlePlayer();
-    // try {
-    //   await contract.pickCharacter(charOption);
-    //   if (useBerserk) {
-    //     await contract.useBerserk();
-    //   }
-    //   if (useForceShield) {
-    //     await contract.useForceShield();
-    //   }
-    //   setShowAlert({
-    //     status: true,
-    //     type: 'info',
-    //     message: `Character & treasures submitted!`,
-    //   });
-    //   setCharOption(0);
-    //   setUseBerserk(false);
-    //   setUseForceShield(false);
-    //   const timer = setTimeout(()=>{setUpdateEvent(!updateEvent);},[4000]);
-    //   return () => clearTimeout(timer);
-    // } catch(error) {
-    //   console.log(error);
-    //   setErrorMessage(error);
-    // }
+    setAttributes("");
+    setMaxSupply("");
+    setTeam("");
+    setCollectionURL("");
+  };
+
+  // const collectionURI =
+  //   "https://gateway.pinata.cloud/ipfs/QmacRZYzXQ1h5SxAjAawnWxqHa295AYNvkMeRhWc1xCNcU?_gl=1*1i2zej6*_ga*YTUwMDhhNzgtYTBiYS00MGU1LWEzYWYtYTk3YzkwMWI0YzFj*_ga_5RMPXG14TE*MTY4MDExNzE2Ni4yMy4wLjE2ODAxMTcxNjcuNTkuMC4w";
+  const inputInfo = () => {
+    //console.log("input!!");
+    const _collectionJason = makeURI();
+    //console.log("ck", _collectionJason);
+    setCollectionJason(_collectionJason);
+  };
+
+  const createCollection = async () => {
+    //console.log("create col!!");
+    //const collectionURI = makeURI();
+    if (contract) {
+      try {
+        await contract.createCollection(
+          collectionAddr,
+          royaltyAddr,
+          royaltyPercent,
+          collectionURL
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const updateCollection = async () => {
+    //console.log("update col!!");
+    //const collectionURI = makeURI();
+    if (contract) {
+      try {
+        await contract.updateCollection(
+          collectionAddr,
+          royaltyAddr,
+          royaltyPercent,
+          collectionURL
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const deleteCollection = async () => {
+    //console.log("delete col!!");
+    if (contract) {
+      try {
+        await contract.deleteCollection(collectionAddr);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const makeURI = () => {
+    const obj = {};
+    obj.name = collectionName;
+    obj.address = collectionAddr;
+    obj.royaltyAddr = royaltyAddr;
+    obj.royaltyPercent = royaltyPercent;
+    obj.websiteURL = websiteURL;
+    obj.iconURL = iconURL;
+    obj.bannerURL = bannerURL;
+    obj.description = collectionDes;
+    obj.attributes = attributes.split(",");
+    obj.maxSupply = maxSupply;
+    obj.team = team;
+    //console.log("obj", JSON.stringify(obj));
+    return JSON.stringify(obj);
   };
 
   return !isAdmin ? null : (
@@ -120,116 +187,230 @@ export default function Admin() {
             value={selectTabId}
             id="0"
           >
-            Create Collection
+            Input Collection Info
           </div>
           <div
             className={
               selectTabId !== "1" ? `${styles.sellTab}` : `${styles.sellTabOn}`
             }
+            value={selectTabId}
             id="1"
+          >
+            Create Collection
+          </div>
+          <div
+            className={
+              selectTabId !== "2" ? `${styles.sellTab}` : `${styles.sellTabOn}`
+            }
+            id="2"
+          >
+            Update Collection
+          </div>
+          <div
+            className={
+              selectTabId !== "3" ? `${styles.sellTab}` : `${styles.sellTabOn}`
+            }
+            id="3"
+          >
+            Cancel Collection
+          </div>
+          <div
+            className={
+              selectTabId !== "4" ? `${styles.sellTab}` : `${styles.sellTabOn}`
+            }
+            id="4"
           >
             Withdraw Balance
           </div>
         </div>
 
-        <form
-          className={styles.sellFormContainer}
-          onSubmit={(event) => {
-            event.preventDefault();
-            handleSubmitCollection();
-          }}
-        >
-          {selectTabId === "1" ? (
-            <div className="flex flex-row my-2">
-              <p className={styles.sellFormLabel}>
-                Owner({showWalletAddress})'s Balance in Contract:{" "}
-              </p>
-              <p className={styles.sellFormLabel}>
-                {ownerBalance ? ownerBalance : "0"}
-              </p>
-            </div>
-          ) : (
-            <>
-              {" "}
-              <label htmlFor="name" className={styles.sellFormLabel}>
-                Collection Name:
-              </label>
-              <input
-                type="text"
-                name="name"
-                id="name"
-                placeholder="input collection name"
-                className={styles.sellFormInput}
-                value={collectionName}
-                onChange={(e) => setCollectionName(e.target.value)}
-              />
-              <label htmlFor="contractAddr" className={styles.sellFormLabel}>
-                Collection Contract Address:
-              </label>
-              <input
-                type="text"
-                name="contractAddr"
-                id="contractAddr"
-                placeholder="input collection contract address"
-                className={styles.sellFormInput}
-                value={collectionAddr}
-                onChange={(e) => setCollectionAddr(e.target.value)}
-              />
-              <label htmlFor="imageURL" className={styles.sellFormLabel}>
-                Image URL:
-              </label>
-              <input
-                type="text"
-                name="imageURL"
-                id="imageURL"
-                placeholder="input collection image URL"
-                className={styles.sellFormInput}
-                value={collectionURL}
-                onChange={(e) => setCollectionURL(e.target.value)}
-              />
-              <label htmlFor="description" className={styles.sellFormLabel}>
-                Description:
-              </label>
-              <input
-                type="text"
-                name="description"
-                id="description"
-                placeholder="input collection description"
-                className={styles.sellFormInput}
-                value={collectionDes}
-                onChange={(e) => setCollectionDes(e.target.value)}
-              />
-              <label htmlFor="rollNumber" className={styles.sellFormLabel}>
-                Supply:
-              </label>
-              <input
-                type="text"
-                name="rollNumber"
-                id="rollNumber"
-                placeholder="input collection total supply"
-                className={styles.sellFormInput}
-                value={collectionSupply}
-                onChange={(e) => setCollectionSupply(e.target.value)}
-              />
-              <label htmlFor="rollNumber" className={styles.sellFormLabel}>
-                Team:
-              </label>
-              <input
-                type="text"
-                name="rollNumber"
-                id="rollNumber"
-                placeholder="input project team name"
-                className={styles.sellFormInput}
-                value={collectionTeam}
-                onChange={(e) => setCollectionTeam(e.target.value)}
-              />
-            </>
-          )}
+        {selectTabId === "4" ? (
+          <OwnerWithdraw />
+        ) : (
+          <form
+            className={styles.sellFormContainer}
+            onSubmit={(event) => {
+              event.preventDefault();
+              handleSubmitCollection();
+            }}
+          >
+            <label htmlFor="contractAddr" className={styles.sellFormLabel}>
+              Collection (NFT) Contract Address:
+            </label>
+            <input
+              type="text"
+              name="contractAddr"
+              id="contractAddr"
+              placeholder=" input collection (NFT) contract address"
+              className={styles.sellFormInput}
+              value={collectionAddr}
+              onChange={(e) => setCollectionAddr(e.target.value)}
+            />
 
-          <button type="submit" className={styles.sellFormButton}>
-            {buttonText}
-          </button>
-        </form>
+            {selectTabId === "3" ? null : (
+              <>
+                <label htmlFor="royaltyAddr" className={styles.sellFormLabel}>
+                  Collection Royalties Payment Address:
+                </label>
+                <input
+                  type="text"
+                  name="royaltyAddr"
+                  id="royaltyAddr"
+                  placeholder=" input collection royalties payment address"
+                  className={styles.sellFormInput}
+                  value={royaltyAddr}
+                  onChange={(e) => setRoyaltyAddr(e.target.value)}
+                />
+                <label
+                  htmlFor="royaltyPercent"
+                  className={styles.sellFormLabel}
+                >
+                  Collection Royalties Percentage:
+                </label>
+                <input
+                  type="text"
+                  name="royaltyPercent"
+                  id="royaltyPercent"
+                  placeholder=" input collection royalties percentage"
+                  className={styles.sellFormInput}
+                  value={royaltyPercent}
+                  onChange={(e) => setRoyaltyPercent(e.target.value)}
+                />
+              </>
+            )}
+
+            {selectTabId === "0" || selectTabId === "3" ? null : (
+              <>
+                <label htmlFor="collectionURL" className={styles.sellFormLabel}>
+                  Collection Metadata URL:
+                </label>
+                <input
+                  type="url"
+                  name="collectionURL"
+                  id="collectionURL"
+                  placeholder=" input collection metadata URL"
+                  className={styles.sellFormInput}
+                  value={collectionURL}
+                  onChange={(e) => setCollectionURL(e.target.value)}
+                />
+              </>
+            )}
+
+            {selectTabId !== "0" ? null : (
+              <>
+                <label htmlFor="name" className={styles.sellFormLabel}>
+                  Collection Name:
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  id="name"
+                  placeholder=" input collection name"
+                  className={styles.sellFormInput}
+                  value={collectionName}
+                  onChange={(e) => setCollectionName(e.target.value)}
+                />
+                <label htmlFor="websiteURL" className={styles.sellFormLabel}>
+                  Website URL:
+                </label>
+                <input
+                  type="url"
+                  name="websiteURL"
+                  id="websiteURL"
+                  placeholder=" input collection website URL"
+                  className={styles.sellFormInput}
+                  value={websiteURL}
+                  onChange={(e) => setWebsiteURL(e.target.value)}
+                />
+                <label htmlFor="imageURL" className={styles.sellFormLabel}>
+                  Icon URL:
+                </label>
+                <input
+                  type="url"
+                  name="iconURL"
+                  id="iconURL"
+                  placeholder=" input collection icon URL"
+                  className={styles.sellFormInput}
+                  value={iconURL}
+                  onChange={(e) => setIconURL(e.target.value)}
+                />
+                <label htmlFor="imageURL" className={styles.sellFormLabel}>
+                  Banner URL:
+                </label>
+                <input
+                  type="url"
+                  name="bannerURL"
+                  id="bannerURL"
+                  placeholder=" input collection banner URL"
+                  className={styles.sellFormInput}
+                  value={bannerURL}
+                  onChange={(e) => setBannerURL(e.target.value)}
+                />
+                <label
+                  htmlFor="description"
+                  className={`${styles.sellFormLabel}`}
+                >
+                  Description:
+                </label>
+                <textarea
+                  type="text"
+                  name="description"
+                  id="description"
+                  placeholder=" input collection description"
+                  className={`${styles.sellFormInput} h-[100px]`}
+                  value={collectionDes}
+                  onChange={(e) => setCollectionDes(e.target.value)}
+                />
+                <label htmlFor="maxSupply" className={styles.sellFormLabel}>
+                  Attributes:
+                </label>
+                <input
+                  type="text"
+                  name="attributes"
+                  id="attributes"
+                  placeholder=" input attributes (i.e. attribute1,attribute2,attribute3)"
+                  className={styles.sellFormInput}
+                  value={attributes}
+                  onChange={(e) => setAttributes(e.target.value)}
+                />
+                <label htmlFor="maxSupply" className={styles.sellFormLabel}>
+                  Max Supply:
+                </label>
+                <input
+                  type="text"
+                  name="maxSupply"
+                  id="maxSupply"
+                  placeholder=" input collection max supply"
+                  className={styles.sellFormInput}
+                  value={maxSupply}
+                  onChange={(e) => setMaxSupply(e.target.value)}
+                />
+                <label htmlFor="team" className={styles.sellFormLabel}>
+                  Team:
+                </label>
+                <input
+                  type="text"
+                  name="team"
+                  id="team"
+                  placeholder=" input project team name"
+                  className={styles.sellFormInput}
+                  value={team}
+                  onChange={(e) => setTeam(e.target.value)}
+                />
+                <div className={styles.sellFormLabel}>Json:</div>
+                {!collectionJason ? null : (
+                  <div className={styles.sellFormInput}>
+                    <p className="break-words">{collectionJason}</p>
+                  </div>
+                )}
+              </>
+            )}
+
+            <button type="submit" className={styles.sellFormButton}>
+              {buttonText}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );

@@ -1,35 +1,52 @@
-import Card from "../components/Card";
-import url1 from "../assets/Karen.png";
-import url2 from "../assets/SuperKitty.png";
-import url3 from "../assets/BaconPro769.png";
-import url4 from "../assets/Fortnitelilbro.png";
-import url5 from "../assets/Meowmeow.png";
+import url from "../assets/Karen.png";
 import styles from "@/styles";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGlobalContext } from "../context";
-import Link from "next/link";
-import Menu from "@/components/AttributeMenu";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import AttributeBox from "@/components/AttributeBox";
 
-const listingsArr = [
-  {
-    url: url1,
-    collection: "Friends",
-    tokenId: 1,
-    price: 0.01,
-  },
-  { url: url2, collection: "Friends", tokenId: 2, price: 0.02 },
-  { url: url3, collection: "Friends", tokenId: 3, price: 0.03 },
-  { url: url4, collection: "Friends", tokenId: 4, price: 0.04 },
-  { url: url5, collection: "Friends", tokenId: 5, price: 0.05 },
-];
+import AttributeBox from "@/components/AttributeBox";
+import { collections } from "@/devData";
+import { useSubgraph } from "@/hooks/subgraph";
+import Listing from "@/components/Listing";
+import { boredStudentsABI, boredStudentsAddress } from "../contract";
+import { ethers } from "ethers";
+
+// const listingsArr = [
+//   {
+//     url: url1,
+//     collection: "Friends",
+//     tokenId: 1,
+//     price: 0.01,
+//   },
+//   { url: url2, collection: "Friends", tokenId: 2, price: 0.02 },
+//   { url: url3, collection: "Friends", tokenId: 3, price: 0.03 },
+//   { url: url4, collection: "Friends", tokenId: 4, price: 0.04 },
+//   { url: url5, collection: "Friends", tokenId: 5, price: 0.05 },
+// ];
 
 export default function Listings() {
-  const { contract, walletAddress, collections, boredStudentsAttributes } =
+  const [nftContract, setNftContract] = useState();
+  const { contract, walletAddress, boredStudentsAttributes, provider } =
     useGlobalContext();
-  //const [showMenu, setShowMenu] = useState(false);
+  console.log("pro", provider);
+  const { loading, error, data } = useSubgraph();
+  //console.log("data", data);
+  const listingsArr = data ? data.listedNFTs : null;
+
+  const collectionsArr = data ? data.createdCollections : null;
+
+  useEffect(() => {
+    const initNftContract = async () => {
+      const signer = await provider.getSigner();
+      const _nftContract = new ethers.Contract(
+        boredStudentsAddress,
+        boredStudentsABI,
+        signer
+      );
+      console.log("nftc1", _nftContract);
+      setNftContract(_nftContract);
+    };
+    if (provider) initNftContract();
+  }, []);
 
   return (
     <div className={styles.pageContainer}>
@@ -63,16 +80,20 @@ export default function Listings() {
             </div>
           </div>
           <div className={styles.listCardsContainer}>
-            {listingsArr.map((listing, idx) => (
-              <Link href="/nft" key={idx}>
-                <Card
-                  url={listing.url}
-                  collection={listing.collection}
-                  tokenId={listing.tokenId}
-                  price={listing.price}
+            {loading ? (
+              <div>Loading...</div>
+            ) : !listingsArr ? (
+              <div>No Listings</div>
+            ) : (
+              listingsArr.map((listing, id) => (
+                <Listing
+                  key={id}
+                  listing={listing}
+                  collectionsArr={collectionsArr}
+                  nftContract={nftContract}
                 />
-              </Link>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>
