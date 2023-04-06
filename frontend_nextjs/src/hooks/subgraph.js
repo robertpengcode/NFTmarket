@@ -8,7 +8,7 @@ const GET_NFTmarket_ITEMS = gql`
       royaltyPercent
       collectionURI
     }
-    listedNFTs(first: 5) {
+    listedNFTs(first: 15) {
       id
       nftContractAddr
       tokenId

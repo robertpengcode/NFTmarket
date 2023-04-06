@@ -9,6 +9,7 @@ export default function Card({
   seller,
   price,
   walletAddress,
+  nftContractAddr,
 }) {
   const convertAddress = (addr) => {
     return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
@@ -25,7 +26,7 @@ export default function Card({
 
   return (
     <div className={styles.cardContainer}>
-      <Link href="/nft">
+      <Link href={`${nftContractAddr}/${tokenId}`}>
         {!imgURL ? null : (
           <Image
             className={styles.cardImage}

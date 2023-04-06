@@ -30,10 +30,10 @@ const collections = [
 
 const boredStudentsAttributes = {
   background: ["yellow", "green", "blue", "purple", "pink"],
-  eyes: ["open", "closed", "glasses", "sun glasses"],
-  mouth: ["smile", "sad", "teeth", "tongue"],
-  hair: ["short", "long", "medium", "punk"],
-  color: ["brown", "white", "yellow"],
+  eyes: ["open", "close", "glasses", "sunglasses"],
+  mouth: ["big", "flat", "teeth", "toung"],
+  hair: ["short", "long", "side", "crew"],
+  face: ["dark", "light", "medium"],
   clothing: ["tie", "shirt", "polo", "jersey"],
 };
 

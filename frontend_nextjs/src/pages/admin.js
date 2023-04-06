@@ -1,8 +1,7 @@
 import styles from "@/styles";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useGlobalContext } from "../context";
 import OwnerWithdraw from "../components/OwnerWithdraw";
-//import { storeMetadata } from "../../utils/uploadToPinata";
 
 export default function Admin() {
   const { contract, walletAddress, isAdmin } = useGlobalContext();
@@ -16,17 +15,21 @@ export default function Admin() {
   const [iconURL, setIconURL] = useState("");
   const [bannerURL, setBannerURL] = useState("");
   const [collectionDes, setCollectionDes] = useState("");
-  const [attributes, setAttributes] = useState("");
+  const [attributeKey1, setAttributeKey1] = useState("");
+  const [attributeKey2, setAttributeKey2] = useState("");
+  const [attributeKey3, setAttributeKey3] = useState("");
+  const [attributeKey4, setAttributeKey4] = useState("");
+  const [attributeKey5, setAttributeKey5] = useState("");
+  const [attributeKey6, setAttributeKey6] = useState("");
+  const [attributeValue1, setAttributeValue1] = useState("");
+  const [attributeValue2, setAttributeValue2] = useState("");
+  const [attributeValue3, setAttributeValue3] = useState("");
+  const [attributeValue4, setAttributeValue4] = useState("");
+  const [attributeValue5, setAttributeValue5] = useState("");
+  const [attributeValue6, setAttributeValue6] = useState("");
   const [maxSupply, setMaxSupply] = useState("");
   const [team, setTeam] = useState("");
   const [collectionJason, setCollectionJason] = useState("");
-
-  const convertAddress = (addr) => {
-    return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
-  };
-  const showWalletAddress = walletAddress ? convertAddress(walletAddress) : "";
-
-  //const handleSubmitSell = async () => {};
 
   const handleTab = (e) => {
     setSelectTabId(e.target.id);
@@ -50,37 +53,7 @@ export default function Admin() {
 
   const buttonText = buttonTextFunc();
 
-  //   const listCharity = async () => {
-  //     if (!contract) {
-  //       alert("Please connect to MetaMask!");
-  //       return;
-  //     }
-  //     await contract
-  //       .listCharity(charityURI, charityAddr, minFundUSD)
-  //       .then(() => alert("list charity success!"))
-  //       .catch((err) => {
-  //         alert(err.message);
-  //       });
-  //     setCharityAddr("");
-  //     setCharityURI("");
-  //     setMinFundUSD("");
-  //   };
-
-  //   const deleteCharity = async (charityId) => {
-  //     if (!contract) {
-  //       alert("Please connect to MetaMask!");
-  //       return;
-  //     }
-  //     await contract
-  //       .deleteCharity(charityId)
-  //       .then(() => alert("delete charity success!"))
-  //       .catch((err) => {
-  //         alert(err.message);
-  //       });
-  //   };
-
   const handleSubmitCollection = () => {
-    //console.log("submit collection!!");
     if (selectTabId === "0") {
       inputInfo();
     } else if (selectTabId === "1") {
@@ -99,24 +72,31 @@ export default function Admin() {
     setIconURL("");
     setBannerURL("");
     setCollectionDes("");
-    setAttributes("");
+    setAttributeKey1("");
+    setAttributeValue1("");
+    setAttributeKey2("");
+    setAttributeValue2("");
+    setAttributeKey3("");
+    setAttributeValue3("");
+    setAttributeKey4("");
+    setAttributeValue4("");
+    setAttributeKey5("");
+    setAttributeValue5("");
+    setAttributeKey6("");
+    setAttributeValue6("");
     setMaxSupply("");
     setTeam("");
     setCollectionURL("");
   };
 
-  // const collectionURI =
-  //   "https://gateway.pinata.cloud/ipfs/QmacRZYzXQ1h5SxAjAawnWxqHa295AYNvkMeRhWc1xCNcU?_gl=1*1i2zej6*_ga*YTUwMDhhNzgtYTBiYS00MGU1LWEzYWYtYTk3YzkwMWI0YzFj*_ga_5RMPXG14TE*MTY4MDExNzE2Ni4yMy4wLjE2ODAxMTcxNjcuNTkuMC4w";
+  //https://scarlet-rainy-alligator-146.mypinata.cloud/ipfs/Qmej87NFyrFBZAVrGKGjq8PTgydbLh83DuhjudZvj3ttd1
+
   const inputInfo = () => {
-    //console.log("input!!");
     const _collectionJason = makeURI();
-    //console.log("ck", _collectionJason);
     setCollectionJason(_collectionJason);
   };
 
   const createCollection = async () => {
-    //console.log("create col!!");
-    //const collectionURI = makeURI();
     if (contract) {
       try {
         await contract.createCollection(
@@ -132,8 +112,6 @@ export default function Admin() {
   };
 
   const updateCollection = async () => {
-    //console.log("update col!!");
-    //const collectionURI = makeURI();
     if (contract) {
       try {
         await contract.updateCollection(
@@ -149,7 +127,6 @@ export default function Admin() {
   };
 
   const deleteCollection = async () => {
-    //console.log("delete col!!");
     if (contract) {
       try {
         await contract.deleteCollection(collectionAddr);
@@ -169,10 +146,29 @@ export default function Admin() {
     obj.iconURL = iconURL;
     obj.bannerURL = bannerURL;
     obj.description = collectionDes;
-    obj.attributes = attributes.split(",");
+    obj.attributes = {};
+
+    if (attributeKey1) {
+      obj.attributes[attributeKey1] = attributeValue1.split(",");
+    }
+    if (attributeKey2) {
+      obj.attributes[attributeKey2] = attributeValue2.split(",");
+    }
+    if (attributeKey3) {
+      obj.attributes[attributeKey3] = attributeValue3.split(",");
+    }
+    if (attributeKey4) {
+      obj.attributes[attributeKey4] = attributeValue4.split(",");
+    }
+    if (attributeKey5) {
+      obj.attributes[attributeKey5] = attributeValue5.split(",");
+    }
+    if (attributeKey6) {
+      obj.attributes[attributeKey6] = attributeValue6.split(",");
+    }
+
     obj.maxSupply = maxSupply;
     obj.team = team;
-    //console.log("obj", JSON.stringify(obj));
     return JSON.stringify(obj);
   };
 
@@ -361,18 +357,188 @@ export default function Admin() {
                   value={collectionDes}
                   onChange={(e) => setCollectionDes(e.target.value)}
                 />
-                <label htmlFor="maxSupply" className={styles.sellFormLabel}>
-                  Attributes:
-                </label>
-                <input
-                  type="text"
-                  name="attributes"
-                  id="attributes"
-                  placeholder=" input attributes (i.e. attribute1,attribute2,attribute3)"
-                  className={styles.sellFormInput}
-                  value={attributes}
-                  onChange={(e) => setAttributes(e.target.value)}
-                />
+
+                <div className={styles.sellFormLabel}> Attributes:</div>
+                <div className={styles.sellFormAttBox}>
+                  <label htmlFor="key1" className={styles.sellFormLabelAttKey}>
+                    Key 1:
+                  </label>
+                  <input
+                    type="text"
+                    name="key1"
+                    id="key1"
+                    placeholder=" input attribute 1"
+                    className={styles.sellFormInputAttKey}
+                    value={attributeKey1}
+                    onChange={(e) => setAttributeKey1(e.target.value)}
+                  />
+                  <label
+                    htmlFor="value1"
+                    className={styles.sellFormLabelAttValue}
+                  >
+                    Value 1:
+                  </label>
+                  <input
+                    type="text"
+                    name="value1"
+                    id="value1"
+                    placeholder=" input elements (i.e. element1,element2,element3) for attribute 1"
+                    className={styles.sellFormInputAttValue}
+                    value={attributeValue1}
+                    onChange={(e) => setAttributeValue1(e.target.value)}
+                  />
+                </div>
+
+                <div className={styles.sellFormAttBox}>
+                  <label htmlFor="key2" className={styles.sellFormLabelAttKey}>
+                    Key 2:
+                  </label>
+                  <input
+                    type="text"
+                    name="key2"
+                    id="key2"
+                    placeholder=" input attribute 2"
+                    className={styles.sellFormInputAttKey}
+                    value={attributeKey2}
+                    onChange={(e) => setAttributeKey2(e.target.value)}
+                  />
+                  <label
+                    htmlFor="value2"
+                    className={styles.sellFormLabelAttValue}
+                  >
+                    Value 2:
+                  </label>
+                  <input
+                    type="text"
+                    name="value2"
+                    id="value2"
+                    placeholder=" input elements (i.e. element1,element2,element3) for attribute 2"
+                    className={styles.sellFormInputAttValue}
+                    value={attributeValue2}
+                    onChange={(e) => setAttributeValue2(e.target.value)}
+                  />
+                </div>
+
+                <div className={styles.sellFormAttBox}>
+                  <label htmlFor="key3" className={styles.sellFormLabelAttKey}>
+                    Key 3:
+                  </label>
+                  <input
+                    type="text"
+                    name="key3"
+                    id="key3"
+                    placeholder=" input attribute 3"
+                    className={styles.sellFormInputAttKey}
+                    value={attributeKey3}
+                    onChange={(e) => setAttributeKey3(e.target.value)}
+                  />
+                  <label
+                    htmlFor="value3"
+                    className={styles.sellFormLabelAttValue}
+                  >
+                    Value 3:
+                  </label>
+                  <input
+                    type="text"
+                    name="value3"
+                    id="value3"
+                    placeholder=" input elements (i.e. element1,element2,element3) for attribute 3"
+                    className={styles.sellFormInputAttValue}
+                    value={attributeValue3}
+                    onChange={(e) => setAttributeValue3(e.target.value)}
+                  />
+                </div>
+
+                <div className={styles.sellFormAttBox}>
+                  <label htmlFor="key4" className={styles.sellFormLabelAttKey}>
+                    Key 4:
+                  </label>
+                  <input
+                    type="text"
+                    name="key4"
+                    id="key4"
+                    placeholder=" input attribute 4"
+                    className={styles.sellFormInputAttKey}
+                    value={attributeKey4}
+                    onChange={(e) => setAttributeKey4(e.target.value)}
+                  />
+                  <label
+                    htmlFor="value4"
+                    className={styles.sellFormLabelAttValue}
+                  >
+                    Value 4:
+                  </label>
+                  <input
+                    type="text"
+                    name="value4"
+                    id="value4"
+                    placeholder=" input elements (i.e. element1,element2,element3) for attribute 4"
+                    className={styles.sellFormInputAttValue}
+                    value={attributeValue4}
+                    onChange={(e) => setAttributeValue4(e.target.value)}
+                  />
+                </div>
+
+                <div className={styles.sellFormAttBox}>
+                  <label htmlFor="key5" className={styles.sellFormLabelAttKey}>
+                    Key 5:
+                  </label>
+                  <input
+                    type="text"
+                    name="key5"
+                    id="key5"
+                    placeholder=" input attribute 5"
+                    className={styles.sellFormInputAttKey}
+                    value={attributeKey5}
+                    onChange={(e) => setAttributeKey5(e.target.value)}
+                  />
+                  <label
+                    htmlFor="value5"
+                    className={styles.sellFormLabelAttValue}
+                  >
+                    Value 5:
+                  </label>
+                  <input
+                    type="text"
+                    name="value5"
+                    id="value5"
+                    placeholder=" input elements (i.e. element1,element2,element3) for attribute 5"
+                    className={styles.sellFormInputAttValue}
+                    value={attributeValue5}
+                    onChange={(e) => setAttributeValue5(e.target.value)}
+                  />
+                </div>
+
+                <div className={styles.sellFormAttBox}>
+                  <label htmlFor="key6" className={styles.sellFormLabelAttKey}>
+                    Key 6:
+                  </label>
+                  <input
+                    type="text"
+                    name="key6"
+                    id="key6"
+                    placeholder=" input attribute 6"
+                    className={styles.sellFormInputAttKey}
+                    value={attributeKey6}
+                    onChange={(e) => setAttributeKey6(e.target.value)}
+                  />
+                  <label
+                    htmlFor="value6"
+                    className={styles.sellFormLabelAttValue}
+                  >
+                    Value 6:
+                  </label>
+                  <input
+                    type="text"
+                    name="value6"
+                    id="value6"
+                    placeholder=" input elements (i.e. element1,element2,element3) for attribute 6"
+                    className={styles.sellFormInputAttValue}
+                    value={attributeValue6}
+                    onChange={(e) => setAttributeValue6(e.target.value)}
+                  />
+                </div>
+
                 <label htmlFor="maxSupply" className={styles.sellFormLabel}>
                   Max Supply:
                 </label>

@@ -1,21 +1,15 @@
 import styles from "@/styles";
-import { useGlobalContext } from "../context";
+import AttributeElement from "./AttributeElement";
 
-export default function AttributeMenu({ attribute }) {
-  const { boredStudentsAttributes } = useGlobalContext();
-
+export default function AttributeMenu({ elements, setSelectedAttributes }) {
   return (
     <div className={styles.listAttributesMenu}>
-      {boredStudentsAttributes[attribute].map((option, id) => (
-        <form key={id} className={styles.listAttributesMenuForm}>
-          <input type="checkbox" id={option} name={option} />
-          <label
-            htmlFor={option}
-            className={styles.listAttributesMenuFormLabel}
-          >
-            {option}
-          </label>
-        </form>
+      {elements.map((option, id) => (
+        <AttributeElement
+          key={id}
+          option={option}
+          setSelectedAttributes={setSelectedAttributes}
+        />
       ))}
     </div>
   );

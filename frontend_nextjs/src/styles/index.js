@@ -47,7 +47,7 @@ const styles = {
   // Listing page
   listContainer: "flex flex-col flex-wrap p-4",
   listCollectionInfoContainer:
-    "flex flex-col justify-evenly w-full h-[100px] rounded-lg bg-white shadow-md",
+    "flex flex-col justify-evenly w-full rounded-lg bg-white shadow-md p-2",
   listCollectionInfoRow: "flex flex-row",
   listCollectionInfoItem:
     "p-1 my-1 mx-2 border-[2px] border-dashed border-purple-400 rounded-md hover:bg-purple-200",
@@ -81,10 +81,10 @@ const styles = {
     "border-[2px] border-dashed border-purple-400 m-2 rounded-md w-fit p-2 hover:bg-purple-200",
   nftAttributesContainer: "flex flex-row flex-wrap",
   nftAttributeBox:
-    "flex flex-col items-center w-[100px] border-[2px] border-dashed border-purple-400 m-2 rounded-md p-2 hover:bg-purple-200",
+    "flex flex-col items-center w-[200px] border-[2px] border-dashed border-purple-400 m-2 rounded-md p-2 hover:bg-purple-200",
   nftAttributeKey: "text-siteWhite",
   nftAttributeValue: "",
-  nftAttributeRare: "",
+  nftAttributeRare: "text-sm",
 
   // Forms on Sell-NFT page
   sellContainer:
@@ -97,6 +97,11 @@ const styles = {
   sellFormContainer: "flex flex-col font-righteous rounded-lg bg-white m-1 p-1",
   sellFormLabel: "mx-2 my-1",
   sellFormInput: "ml-4 mr-2 mt-1 mb-4 pl-1 border rounded-md",
+  sellFormAttBox: "flex flex-row justify-between pl-4 my-1 mr-2 mb-2",
+  sellFormLabelAttKey: "mr-2",
+  sellFormInputAttKey: "mr-2 border rounded-md w-[20%]",
+  sellFormLabelAttValue: "mr-2",
+  sellFormInputAttValue: "border rounded-md w-[55%]",
   sellFormButton:
     "font-righteous rounded-md bg-sitePurple hover:bg-purple-500 w-fit text-white p-2 my-3 ml-2",
 

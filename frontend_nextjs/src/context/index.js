@@ -1,20 +1,17 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { marketABI, marketAddress } from "../contract";
-import { boredStudentsAttributes } from "@/devData";
-
-//import { useSubgraph } from "@/hooks/subgraph";
+import { boredStudentsABI, boredStudentsAddress } from "../contract";
 
 const GlobalContext = createContext();
 
 export const GlobalContextProvider = ({ children }) => {
   const [contract, setContract] = useState(null);
+  const [nftContract, setNftContract] = useState(null);
   const [walletAddress, setWalletAddress] = useState("");
   const [walletBalance, setWalletBalance] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [provider, setProvider] = useState(null);
-
-  //const { loading, error, data } = useSubgraph();
 
   //* Set the wallet address to the state
   const updateAddress = async (accounts) => {
@@ -22,7 +19,6 @@ export const GlobalContextProvider = ({ children }) => {
       window.localStorage.removeItem("connected");
       setWalletAddress(null);
       setContract(null);
-      //setIsPlayer(false);
     } else if (accounts[0] === walletAddress) {
       return;
     } else {
@@ -33,12 +29,17 @@ export const GlobalContextProvider = ({ children }) => {
         await newProvider.getBalance(accounts[0])
       ).toString();
       const balanceInETH = ethers.formatEther(balance);
-      //console.log("balance", balanceInETH);
       setWalletBalance(balanceInETH);
       const signer = await newProvider.getSigner();
       const newContract = new ethers.Contract(marketAddress, marketABI, signer);
+      const _nftContract = new ethers.Contract(
+        boredStudentsAddress,
+        boredStudentsABI,
+        signer
+      );
       setContract(newContract);
       setProvider(newProvider);
+      setNftContract(_nftContract);
       const owner = (await newContract.owner()).toLowerCase();
       const isAdmin = owner === accounts[0];
       setIsAdmin(isAdmin);
@@ -51,12 +52,17 @@ export const GlobalContextProvider = ({ children }) => {
     setWalletAddress(account);
     const balance = await (await newProvider.getBalance(account)).toString();
     const balanceInETH = ethers.formatEther(balance);
-    //console.log("balance", balanceInETH);
     setWalletBalance(balanceInETH);
     const signer = await newProvider.getSigner();
     const newContract = new ethers.Contract(marketAddress, marketABI, signer);
+    const _nftContract = new ethers.Contract(
+      boredStudentsAddress,
+      boredStudentsABI,
+      signer
+    );
     setContract(newContract);
     setProvider(newProvider);
+    setNftContract(_nftContract);
     const owner = (await newContract.owner()).toLowerCase();
     const isAdmin = owner === account;
     setIsAdmin(isAdmin);
@@ -71,13 +77,18 @@ export const GlobalContextProvider = ({ children }) => {
         await newProvider.getBalance(accounts[0])
       ).toString();
       const balanceInETH = ethers.formatEther(balance);
-      //console.log("balance", balanceInETH);
       setWalletBalance(balanceInETH);
       const signer = await newProvider.getSigner();
       window.localStorage.setItem("connected", accounts[0]);
       const newContract = new ethers.Contract(marketAddress, marketABI, signer);
+      const _nftContract = new ethers.Contract(
+        boredStudentsAddress,
+        boredStudentsABI,
+        signer
+      );
       setProvider(newProvider);
       setContract(newContract);
+      setNftContract(_nftContract);
       const owner = (await newContract.owner()).toLowerCase();
       const isAdmin = owner === accounts[0];
       setIsAdmin(isAdmin);
@@ -90,7 +101,6 @@ export const GlobalContextProvider = ({ children }) => {
     if (window.ethereum && window.localStorage.getItem("connected")) {
       restore();
     } else {
-      //console.log('no need to do anything');
       return;
     }
   }, []);
@@ -105,11 +115,11 @@ export const GlobalContextProvider = ({ children }) => {
     <GlobalContext.Provider
       value={{
         contract,
+        nftContract,
         walletAddress,
         walletBalance,
         connectWallet,
         isAdmin,
-        boredStudentsAttributes,
         provider,
       }}
     >

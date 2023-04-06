@@ -1,43 +1,66 @@
 import { ethers } from "ethers";
 import styles from "@/styles";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useGlobalContext } from "../context";
+import { useSubgraph } from "@/hooks/subgraph";
 import UserWithdraw from "@/components/UserWithdraw";
 
 export default function SellNFT() {
-  const { contract, walletAddress, collections } = useGlobalContext();
+  const { loading, error, data } = useSubgraph();
+  const collectionsArr = data ? data.createdCollections : null;
+  console.log(collectionsArr);
+  const { contract, walletAddress, nftContract } = useGlobalContext();
   const [collectionName, setCollectionName] = useState("");
   const [collectionAddr, setCollectionAddr] = useState("");
   const [tokenId, setTokenId] = useState("");
   const [price, setPrice] = useState("");
   const [selectTabId, setSelectTabId] = useState("0");
+  const [collectionNamesArr, setCollectionNamesArr] = useState([]);
+  const [collectionAddrsArr, setCollectionAddrsArr] = useState([]);
 
-  console.log("what?", collections);
+  async function updateUI() {
+    const _collectionNamesArr = [];
+    const _collectionAddrsArr = [];
+    for (let i = 0; i < collectionsArr.length; i++) {
+      //console.log("ii", collectionsArr);
+      const response = await (
+        await fetch(collectionsArr[i].collectionURI)
+      ).json();
+      //console.log("res", response);
+      _collectionNamesArr.push(response.name);
+      _collectionAddrsArr.push(collectionsArr[i].nftContractAddr);
+    }
+    setCollectionNamesArr(_collectionNamesArr);
+    //console.log("ch", _collectionAddrsArr);
+    setCollectionAddrsArr(_collectionAddrsArr);
+  }
 
-  const collectionNamesArr = collections
-    ? collections.map((collection) => collection.name)
-    : [];
+  useEffect(() => {
+    if (collectionsArr) {
+      updateUI();
+    }
+  }, []);
+
+  // const collectionNamesArr = collections
+  //   ? collections.map((collection) => collection.name)
+  //   : [];
 
   const collectionNameOptions = [
     "--choose a collection--",
     ...collectionNamesArr,
     "Others",
   ];
-  const collectionAddrsArr = collections
-    ? collections.map((collection) => collection.address)
-    : [];
-
-  const convertAddress = (addr) => {
-    return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
-  };
-  const showWalletAddress = walletAddress ? convertAddress(walletAddress) : "";
+  // const collectionAddrsArr = collections
+  //   ? collections.map((collection) => collection.address)
+  //   : [];
 
   const handleCollectionAddr = (name) => {
     if (collectionNamesArr.includes(name)) {
       const id = collectionNamesArr.indexOf(name);
+      //console.log("id", id);
       setCollectionAddr(collectionAddrsArr[id]);
     } else {
-      setCollectionAddr("");
+      setCollectionAddr("xxxx");
     }
   };
 
@@ -48,27 +71,33 @@ export default function SellNFT() {
   const buttonTextFunc = () => {
     switch (selectTabId) {
       case "1":
-        return "Update Price";
+        return "List NFT";
         break;
       case "2":
+        return "Update Price";
+        break;
+      case "3":
         return "Cancel Listing";
         break;
       default:
-        return "List NFT";
+        return "Approve NFT";
     }
   };
 
   const buttonText = buttonTextFunc();
 
   const handleSubmitSell = () => {
-    console.log("submit sell!!");
+    //console.log("submit sell!!");
     if (selectTabId === "0") {
-      approveAndList();
+      approve();
     } else if (selectTabId === "1") {
-      updateList();
+      list();
     } else if (selectTabId === "2") {
+      updateList();
+    } else if (selectTabId === "3") {
       cancelList();
     }
+
     setCollectionName("");
     setCollectionAddr("");
     setTokenId("");
@@ -76,8 +105,18 @@ export default function SellNFT() {
   };
 
   //nft contract 0xE3fca70EF8B81112E2386ECb490De51BF459c299
-  const approveAndList = async () => {
-    console.log("create list!");
+
+  const approve = async () => {
+    if (nftContract) {
+      try {
+        await nftContract.approve(contract.target, tokenId);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const list = async () => {
     const priceInWei = ethers.parseEther(price);
     if (contract) {
       try {
@@ -89,7 +128,6 @@ export default function SellNFT() {
   };
 
   const updateList = async () => {
-    console.log("update list!");
     const priceInWei = ethers.parseEther(price);
     if (contract) {
       try {
@@ -101,7 +139,6 @@ export default function SellNFT() {
   };
 
   const cancelList = async () => {
-    console.log("cancel list!");
     if (contract) {
       try {
         await contract.deleteListing(collectionAddr, tokenId);
@@ -122,15 +159,16 @@ export default function SellNFT() {
             value={selectTabId}
             id="0"
           >
-            List NFT
+            Approve NFT
           </div>
           <div
             className={
               selectTabId !== "1" ? `${styles.sellTab}` : `${styles.sellTabOn}`
             }
+            value={selectTabId}
             id="1"
           >
-            Update Price
+            List NFT
           </div>
           <div
             className={
@@ -138,7 +176,7 @@ export default function SellNFT() {
             }
             id="2"
           >
-            Cancel Listing
+            Update Price
           </div>
           <div
             className={
@@ -146,11 +184,19 @@ export default function SellNFT() {
             }
             id="3"
           >
+            Cancel Listing
+          </div>
+          <div
+            className={
+              selectTabId !== "4" ? `${styles.sellTab}` : `${styles.sellTabOn}`
+            }
+            id="4"
+          >
             Withdraw Proceed
           </div>
         </div>
 
-        {selectTabId === "3" ? (
+        {selectTabId === "4" ? (
           <UserWithdraw />
         ) : (
           <form
@@ -203,7 +249,7 @@ export default function SellNFT() {
               value={tokenId}
               onChange={(e) => setTokenId(e.target.value)}
             />
-            {selectTabId !== "2" && (
+            {selectTabId !== "0" && selectTabId !== "3" && (
               <>
                 <label htmlFor="sellPrice" className={styles.sellFormLabel}>
                   Price in Matic:

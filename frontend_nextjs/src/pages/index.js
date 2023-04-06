@@ -1,13 +1,11 @@
 import Head from "next/head";
 
-//import { useRouter } from "next/router";
 import styles from "@/styles";
 import { useGlobalContext } from "../context";
 import { useSubgraph } from "@/hooks/subgraph";
 import CollectionRow from "../components/CollectionRow";
 
 export default function Home() {
-  const { contract, walletAddress } = useGlobalContext();
   const { loading, error, data } = useSubgraph();
 
   const collectionsArr = data ? data.createdCollections : null;
@@ -53,45 +51,3 @@ export default function Home() {
     </>
   );
 }
-
-// function getRows(_collectionsArr) {
-//   const _rows = [];
-//   for (let i = 0; i < _collectionsArr.length; i++) {
-//     let obj = {};
-//     obj.key = `${i + 1}`;
-//     obj.collection = collections[i].name;
-//     obj.by = collections[i].team;
-//     obj.floorPrice = "0.01 ETH";
-//     obj.supply = collections[i].supply;
-//     _rows.push(obj);
-//   }
-//   //console.log("chi", _rows);
-//   return _rows;
-// }
-
-//const rows = data ? getRows(data.createdCollections) : null;
-// console.log("r", rows);
-
-// const rows = [
-//   {
-//     key: "1",
-//     collection: "Friends",
-//     by: "NOZO_ART",
-//     floorPrice: "0.01 ETH",
-//     supply: "10",
-//   },
-//   {
-//     key: "2",
-//     collection: "Bored Kids",
-//     by: "NOZO_ART",
-//     floorPrice: "0.01 ETH",
-//     supply: "100",
-//   },
-//   {
-//     key: "3",
-//     collection: "Crypto Robots",
-//     by: "COOLDAD",
-//     floorPrice: "0.01 ETH",
-//     supply: "50",
-//   },
-// ];
