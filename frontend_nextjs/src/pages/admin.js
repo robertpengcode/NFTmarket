@@ -89,8 +89,6 @@ export default function Admin() {
     setCollectionURL("");
   };
 
-  //https://scarlet-rainy-alligator-146.mypinata.cloud/ipfs/Qmej87NFyrFBZAVrGKGjq8PTgydbLh83DuhjudZvj3ttd1
-
   const inputInfo = () => {
     const _collectionJason = makeURI();
     setCollectionJason(_collectionJason);

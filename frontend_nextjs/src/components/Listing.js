@@ -2,7 +2,13 @@ import { useState } from "react";
 import { useGlobalContext } from "../context";
 import Card from "../components/Card";
 
-export default function Listing({ listing, nftContract, selectedAttributes }) {
+export default function Listing({
+  listing,
+  nftContract,
+  selectedAttributes,
+  marketFeePercent,
+  royaltyPercent,
+}) {
   const { walletAddress } = useGlobalContext();
   const [nftImgURL, setNftImgURL] = useState("");
   const [showNFT, setShowNFT] = useState(true);
@@ -31,12 +37,18 @@ export default function Listing({ listing, nftContract, selectedAttributes }) {
     return true;
   }
 
+  //console.log("p", price, typeof price);
+  const totalPrice = (
+    (price * (100 + Number(marketFeePercent) + Number(royaltyPercent))) /
+    100
+  ).toString();
+
   return !listing || showNFT === false ? null : (
     <Card
       imgURL={nftImgURL}
       tokenId={tokenId}
       seller={seller}
-      price={price}
+      totalPrice={totalPrice}
       walletAddress={walletAddress}
       nftContractAddr={nftContractAddr}
     />

@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 import AttributeBox from "@/components/AttributeBox";
 import { useSubgraph } from "@/hooks/subgraph";
 import Listing from "@/components/Listing";
-//import { UpdateOutlined } from "@mui/icons-material";
 
 export default function Listings() {
   const router = useRouter();
@@ -13,11 +12,9 @@ export default function Listings() {
   const { contract, walletAddress, provider, nftContract } = useGlobalContext();
 
   const [selectedAttributes, setSelectedAttributes] = useState([]);
-  //console.log("chichi!", selectedAttributes);
 
   const { loading, error, data } = useSubgraph();
   const listingsArr = data ? data.listedNFTs : null;
-  // console.log("list", listingsArr);
 
   const collection = data
     ? data.createdCollections.find(
@@ -25,12 +22,13 @@ export default function Listings() {
       )
     : null;
 
-  const { collectionURI } = collection ? collection : "";
+  const { collectionURI, royaltyPercent } = collection ? collection : "";
 
   const [name, setName] = useState("");
   const [team, setTeam] = useState("");
   const [description, setDescription] = useState("");
   const [attributes, setAttributes] = useState([]);
+  const [marketFeePercent, setMarketFeePercent] = useState("");
 
   useEffect(() => {
     async function updateUI() {
@@ -41,6 +39,10 @@ export default function Listings() {
         setDescription(response.description);
         setAttributes(response.attributes);
         setSelectedAttributes(processAttributes(response.attributes));
+      }
+      if (contract) {
+        const _marketFeePercent = await contract.marketFeePercent();
+        setMarketFeePercent(_marketFeePercent.toString());
       }
     }
     updateUI();
@@ -101,6 +103,8 @@ export default function Listings() {
                     listing={listing}
                     nftContract={nftContract}
                     selectedAttributes={selectedAttributes}
+                    marketFeePercent={marketFeePercent}
+                    royaltyPercent={royaltyPercent}
                   />
                 ))
             )}

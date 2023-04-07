@@ -7,14 +7,13 @@ import { useSubgraph } from "@/hooks/subgraph";
 import { ethers } from "ethers";
 
 export default function Nft() {
-  const { contract, walletAddress, provider, nftContract } = useGlobalContext();
+  const { contract, walletAddress, nftContract } = useGlobalContext();
   const router = useRouter();
   const { collectionContract, tokenId } = router.query;
 
   const { loading, error, data } = useSubgraph();
 
   const [attributesCount, setAttributesCount] = useState(null);
-  //console.log("count", attributesCount);
 
   const collection = data
     ? data.createdCollections.find(
@@ -22,7 +21,9 @@ export default function Nft() {
       )
     : null;
 
-  const { collectionURI } = collection ? collection : "";
+  const { collectionURI, nftContractAddr, royaltyPercent } = collection
+    ? collection
+    : "";
 
   const listing = data
     ? data.listedNFTs.find(
@@ -72,7 +73,6 @@ export default function Nft() {
     return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
   };
   const showSeller = seller ? convertAddress(seller) : "";
-  const showPrice = price ? ethers.formatEther(price) : "";
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -80,6 +80,7 @@ export default function Nft() {
   const [attributes, setAttributes] = useState([]);
   const [collectionName, setCollectionName] = useState("");
   const [team, setTeam] = useState("");
+  const [marketFeePercent, setMarketFeePercent] = useState("");
 
   useEffect(() => {
     const getNftUri = async () => {
@@ -95,12 +96,38 @@ export default function Nft() {
         setCollectionName(response.name);
         setTeam(response.team);
       }
+
+      if (contract) {
+        const _marketFeePercent = await contract.marketFeePercent();
+        setMarketFeePercent(_marketFeePercent.toString());
+      }
     };
 
     if (nftContract && tokenId) {
       getNftUri();
     }
   }, []);
+
+  const totalPrice = price
+    ? (
+        (price * (100 + Number(marketFeePercent) + Number(royaltyPercent))) /
+        100
+      ).toString()
+    : "";
+
+  const showPrice = totalPrice ? ethers.formatEther(totalPrice) : "";
+
+  const handleBuy = async () => {
+    console.log("buy buy");
+    console.log("t", totalPrice);
+    if (contract) {
+      try {
+        await contract.buyNFT(nftContractAddr, tokenId, { value: totalPrice });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
   return (
     <div className={styles.pageContainer}>
@@ -122,7 +149,13 @@ export default function Nft() {
           </div>
           <div className={styles.nftInfoLeftItem}>Price: {showPrice} MATIC</div>
           <div className={styles.nftInfoLeftItem}>Sell By: {showSeller}</div>
-          <button className={styles.nftBTN}>Buy Now</button>
+          <button
+            className={styles.nftBTN}
+            disabled={seller === walletAddress}
+            onClick={handleBuy}
+          >
+            Buy Now
+          </button>
         </div>
         <div className={styles.nftInfoRight}>
           <div className={styles.nftInfoRightItem}>

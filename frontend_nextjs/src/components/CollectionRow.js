@@ -2,14 +2,29 @@ import styles from "@/styles";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ethers } from "ethers";
 
-export default function CollectionRow({ collection }) {
+export default function CollectionRow({ collection, listingsArr }) {
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
   const [team, setTeam] = useState("");
   const [maxSupply, setMaxSupply] = useState("");
+  const [floor, setFloor] = useState("");
 
   const { collectionURI, nftContractAddr } = collection;
+
+  useEffect(() => {
+    const calculateFloor = async (listings) => {
+      const arr = listings.map((listing) =>
+        Number(ethers.formatEther(listing.price))
+      );
+      const _floor = Math.min(...arr).toString();
+      setFloor(_floor);
+    };
+    if (listingsArr) {
+      calculateFloor(listingsArr);
+    }
+  }, []);
 
   async function updateUI() {
     if (collectionURI) {
@@ -42,7 +57,7 @@ export default function CollectionRow({ collection }) {
         )}
       </div>
       <div className={styles.homeCollectionRowItem}>{team}</div>
-      <div className={styles.homeCollectionRowItem}>1 MATIC</div>
+      <div className={styles.homeCollectionRowItem}>{floor} MATIC</div>
       <div className={styles.homeCollectionRowItem}>{maxSupply}</div>
     </Link>
   );

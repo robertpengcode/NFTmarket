@@ -8,7 +8,6 @@ import UserWithdraw from "@/components/UserWithdraw";
 export default function SellNFT() {
   const { loading, error, data } = useSubgraph();
   const collectionsArr = data ? data.createdCollections : null;
-  console.log(collectionsArr);
   const { contract, walletAddress, nftContract } = useGlobalContext();
   const [collectionName, setCollectionName] = useState("");
   const [collectionAddr, setCollectionAddr] = useState("");
@@ -22,16 +21,13 @@ export default function SellNFT() {
     const _collectionNamesArr = [];
     const _collectionAddrsArr = [];
     for (let i = 0; i < collectionsArr.length; i++) {
-      //console.log("ii", collectionsArr);
       const response = await (
         await fetch(collectionsArr[i].collectionURI)
       ).json();
-      //console.log("res", response);
       _collectionNamesArr.push(response.name);
       _collectionAddrsArr.push(collectionsArr[i].nftContractAddr);
     }
     setCollectionNamesArr(_collectionNamesArr);
-    //console.log("ch", _collectionAddrsArr);
     setCollectionAddrsArr(_collectionAddrsArr);
   }
 
@@ -41,23 +37,15 @@ export default function SellNFT() {
     }
   }, []);
 
-  // const collectionNamesArr = collections
-  //   ? collections.map((collection) => collection.name)
-  //   : [];
-
   const collectionNameOptions = [
     "--choose a collection--",
     ...collectionNamesArr,
     "Others",
   ];
-  // const collectionAddrsArr = collections
-  //   ? collections.map((collection) => collection.address)
-  //   : [];
 
   const handleCollectionAddr = (name) => {
     if (collectionNamesArr.includes(name)) {
       const id = collectionNamesArr.indexOf(name);
-      //console.log("id", id);
       setCollectionAddr(collectionAddrsArr[id]);
     } else {
       setCollectionAddr("xxxx");
@@ -87,7 +75,6 @@ export default function SellNFT() {
   const buttonText = buttonTextFunc();
 
   const handleSubmitSell = () => {
-    //console.log("submit sell!!");
     if (selectTabId === "0") {
       approve();
     } else if (selectTabId === "1") {
@@ -97,14 +84,11 @@ export default function SellNFT() {
     } else if (selectTabId === "3") {
       cancelList();
     }
-
     setCollectionName("");
     setCollectionAddr("");
     setTokenId("");
     setPrice("");
   };
-
-  //nft contract 0xE3fca70EF8B81112E2386ECb490De51BF459c299
 
   const approve = async () => {
     if (nftContract) {

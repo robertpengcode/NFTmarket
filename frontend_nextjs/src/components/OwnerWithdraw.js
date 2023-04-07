@@ -1,6 +1,7 @@
 import styles from "@/styles";
 import { useState, useEffect } from "react";
 import { useGlobalContext } from "../context";
+import { ethers } from "ethers";
 
 export default function OwnerWithdraw() {
   const { contract, walletAddress } = useGlobalContext();
@@ -28,8 +29,15 @@ export default function OwnerWithdraw() {
   const showWalletAddress = walletAddress ? convertAddress(walletAddress) : "";
   const showContractAddress = contract ? convertAddress(contract.target) : "";
 
-  const handleOwnerWithdraw = () => {
-    console.log("withdraw!!");
+  const handleOwnerWithdraw = async () => {
+    const withdrawInWei = ethers.parseEther(withdrawAmount);
+    if (contract) {
+      try {
+        await contract.ownerWithdrawFee(withdrawInWei);
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
 
   return (
@@ -45,7 +53,7 @@ export default function OwnerWithdraw() {
           Contract({showContractAddress})'s Balance:{" "}
         </p>
         <p className={styles.sellFormLabel}>
-          {contractBalance ? contractBalance : "0"}
+          {contractBalance ? ethers.formatEther(contractBalance) : ""} MATIC
         </p>
       </div>
       <div className="flex flex-row my-1">
@@ -53,18 +61,18 @@ export default function OwnerWithdraw() {
           Owner({showWalletAddress})'s Balance in the Contract:{" "}
         </p>
         <p className={styles.sellFormLabel}>
-          {ownerBalance ? ownerBalance : "0"}
+          {ownerBalance ? ethers.formatEther(ownerBalance) : ""} MATIC
         </p>
       </div>
 
       <label htmlFor="tokenId" className={styles.sellFormLabel}>
-        Withdraw Amount:
+        Withdraw Amount in MATIC:
       </label>
       <input
         type="text"
         name="withdrawAmount"
         id="withdrawAmount"
-        placeholder=" input withdraw amount"
+        placeholder=" input withdraw amount in MATIC"
         className={styles.sellFormInput}
         value={withdrawAmount}
         onChange={(e) => setWithdrawAmount(e.target.value)}

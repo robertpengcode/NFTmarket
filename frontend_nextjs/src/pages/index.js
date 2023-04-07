@@ -1,18 +1,16 @@
 import Head from "next/head";
 
 import styles from "@/styles";
-import { useGlobalContext } from "../context";
+//import { useGlobalContext } from "../context";
 import { useSubgraph } from "@/hooks/subgraph";
 import CollectionRow from "../components/CollectionRow";
+import Spinner from "@/components/Spinner";
 
 export default function Home() {
   const { loading, error, data } = useSubgraph();
-
   const collectionsArr = data ? data.createdCollections : null;
 
-  // if (data) {
-  //   console.log("data", data.createdCollections);
-  // }
+  const listingsArr = data ? data.listedNFTs : null;
 
   return (
     <>
@@ -33,16 +31,24 @@ export default function Home() {
               <div className={styles.homeCollectionRowItemBig}>Collection</div>
               <div className={styles.homeCollectionRowItem}>By</div>
               <div className={styles.homeCollectionRowItem}>Floor Price</div>
-              <div className={styles.homeCollectionRowItem}>Supply</div>
+              <div className={styles.homeCollectionRowItem}>Max Supply</div>
             </div>
-
             {loading ? (
-              <div>Loading...</div>
+              <div className="m-4">
+                <Spinner />
+              </div>
             ) : !collectionsArr ? (
               <div>No Collections</div>
             ) : (
               collectionsArr.map((collection, id) => (
-                <CollectionRow key={id} collection={collection} />
+                <CollectionRow
+                  key={id}
+                  collection={collection}
+                  listingsArr={listingsArr.filter(
+                    (listing) =>
+                      listing.nftContractAddr === collection.nftContractAddr
+                  )}
+                />
               ))
             )}
           </div>

@@ -2,15 +2,17 @@ import styles from "@/styles";
 import Image from "next/image";
 import { ethers } from "ethers";
 import Link from "next/link";
+import { useGlobalContext } from "../context";
 
 export default function Card({
   imgURL,
   tokenId,
   seller,
-  price,
+  totalPrice,
   walletAddress,
   nftContractAddr,
 }) {
+  const { contract } = useGlobalContext();
   const convertAddress = (addr) => {
     return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
   };
@@ -20,8 +22,14 @@ export default function Card({
     ? "You"
     : convertAddress(seller);
 
-  const handleBuy = () => {
-    console.log("buy buy");
+  const handleBuy = async () => {
+    if (contract) {
+      try {
+        await contract.buyNFT(nftContractAddr, tokenId, { value: totalPrice });
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
 
   return (
@@ -40,7 +48,7 @@ export default function Card({
 
       <p className={styles.cardText}>#{tokenId}</p>
       <p className={styles.cardText}>Owned By {showSellerAddress}</p>
-      <p className={styles.cardText}>{ethers.formatEther(price)} MATIC</p>
+      <p className={styles.cardText}>{ethers.formatEther(totalPrice)} MATIC</p>
       <button
         className={styles.cardButton}
         disabled={seller === walletAddress}

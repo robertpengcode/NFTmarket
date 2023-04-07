@@ -1,6 +1,7 @@
 import styles from "@/styles";
 import { useState, useEffect } from "react";
 import { useGlobalContext } from "../context";
+import { ethers } from "ethers";
 
 export default function UserWithdraw() {
   const { contract, walletAddress } = useGlobalContext();
@@ -23,8 +24,14 @@ export default function UserWithdraw() {
   };
   const showWalletAddress = walletAddress ? convertAddress(walletAddress) : "";
 
-  const handleUserWithdraw = () => {
-    console.log("user withdraw!!");
+  const handleUserWithdraw = async () => {
+    if (contract) {
+      try {
+        await contract.usersWithdraw();
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
 
   return (
@@ -40,7 +47,7 @@ export default function UserWithdraw() {
           User({showWalletAddress})'s Proceed in the Contract:{" "}
         </p>
         <p className={styles.sellFormLabel}>
-          {userBalance ? userBalance : "0"}
+          {userBalance ? ethers.formatEther(userBalance) : ""} MATIC
         </p>
       </div>
 
