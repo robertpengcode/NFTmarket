@@ -15,6 +15,10 @@ export default function CollectionRow({ collection, listingsArr }) {
 
   useEffect(() => {
     const calculateFloor = async (listings) => {
+      if (!listings.length) {
+        setFloor("0");
+        return;
+      }
       const arr = listings.map((listing) =>
         Number(ethers.formatEther(listing.price))
       );

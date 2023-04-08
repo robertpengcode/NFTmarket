@@ -1,0 +1,16 @@
+{
+    "id": "2",
+    "name": "Meowmeow",
+    "description": "Friends in adventure",
+    "image": "https://ipfs.io/ipfs/QmPeYXTGPPQjHgW3LA3LZ1SAFDLH7nZsfAg4yx3MmteTaP/2.png",
+    "attributes": [
+      {
+        "trait_type": "personality",
+        "value": "very nice"
+      },
+      {
+        "trait_type": "skill",
+        "value": "crafting"
+      }
+    ]
+  }

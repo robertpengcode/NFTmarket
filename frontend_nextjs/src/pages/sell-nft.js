@@ -8,7 +8,8 @@ import UserWithdraw from "@/components/UserWithdraw";
 export default function SellNFT() {
   const { loading, error, data } = useSubgraph();
   const collectionsArr = data ? data.createdCollections : null;
-  const { contract, walletAddress, nftContract } = useGlobalContext();
+  const { contract, walletAddress, nftContract, nft2Contract } =
+    useGlobalContext();
   const [collectionName, setCollectionName] = useState("");
   const [collectionAddr, setCollectionAddr] = useState("");
   const [tokenId, setTokenId] = useState("");
@@ -16,6 +17,9 @@ export default function SellNFT() {
   const [selectTabId, setSelectTabId] = useState("0");
   const [collectionNamesArr, setCollectionNamesArr] = useState([]);
   const [collectionAddrsArr, setCollectionAddrsArr] = useState([]);
+  const [theNftContract, setTheNftContract] = useState(null);
+  //console.log("the", theNftContract);
+  //console.log("1", nftContract, "2", nft2Contract);
 
   async function updateUI() {
     const _collectionNamesArr = [];
@@ -46,7 +50,14 @@ export default function SellNFT() {
   const handleCollectionAddr = (name) => {
     if (collectionNamesArr.includes(name)) {
       const id = collectionNamesArr.indexOf(name);
+      //console.log("ck", collectionAddrsArr[id]);
       setCollectionAddr(collectionAddrsArr[id]);
+      const _theNftContract = [nftContract, nft2Contract].find(
+        (_nftContract) =>
+          _nftContract.target.toLowerCase() === collectionAddrsArr[id]
+      );
+      //console.log("what?", _theNftContract);
+      setTheNftContract(_theNftContract);
     } else {
       setCollectionAddr("xxxx");
     }
@@ -91,9 +102,9 @@ export default function SellNFT() {
   };
 
   const approve = async () => {
-    if (nftContract) {
+    if (theNftContract) {
       try {
-        await nftContract.approve(contract.target, tokenId);
+        await theNftContract.approve(contract.target, tokenId);
       } catch (error) {
         console.log(error);
       }

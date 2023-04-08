@@ -1,0 +1,16 @@
+{
+    "id": "1",
+    "name": "Fortnitelilbro",
+    "description": "Friends in adventure",
+    "image": "https://ipfs.io/ipfs/QmPeYXTGPPQjHgW3LA3LZ1SAFDLH7nZsfAg4yx3MmteTaP/1.png",
+    "attributes": [
+      {
+        "trait_type": "personality",
+        "value": "curious"
+      },
+      {
+        "trait_type": "skill",
+        "value": "playing video games"
+      }
+    ]
+  }

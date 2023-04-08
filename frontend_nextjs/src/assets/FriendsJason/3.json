@@ -1,0 +1,16 @@
+{
+    "id": "3",
+    "name": "BaconPro769",
+    "description": "Friends in adventure",
+    "image": "https://ipfs.io/ipfs/QmPeYXTGPPQjHgW3LA3LZ1SAFDLH7nZsfAg4yx3MmteTaP/3.png",
+    "attributes": [
+      {
+        "trait_type": "personality",
+        "value": "chill"
+      },
+      {
+        "trait_type": "skill",
+        "value": "karate"
+      }
+    ]
+  }

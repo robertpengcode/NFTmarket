@@ -7,13 +7,15 @@ import { useSubgraph } from "@/hooks/subgraph";
 import { ethers } from "ethers";
 
 export default function Nft() {
-  const { contract, walletAddress, nftContract } = useGlobalContext();
+  const { contract, walletAddress, nftContract, nft2Contract } =
+    useGlobalContext();
   const router = useRouter();
   const { collectionContract, tokenId } = router.query;
 
   const { loading, error, data } = useSubgraph();
 
   const [attributesCount, setAttributesCount] = useState(null);
+  const [theNftContract, setTheNftContract] = useState(null);
 
   const collection = data
     ? data.createdCollections.find(
@@ -43,9 +45,13 @@ export default function Nft() {
 
   useEffect(() => {
     const calculateRarity = async (listings) => {
+      const _theNftContract = [nftContract, nft2Contract].find(
+        (_nftContract) =>
+          _nftContract.target.toLowerCase() === collection.nftContractAddr
+      );
       const result = {};
       for (let i = 0; i < listings.length; i++) {
-        const nftURI = await nftContract.tokenURI(
+        const nftURI = await _theNftContract.tokenURI(
           listings[i].tokenId.toString()
         );
         const { attributes } = await (await fetch(nftURI)).json();
@@ -84,7 +90,14 @@ export default function Nft() {
 
   useEffect(() => {
     const getNftUri = async () => {
-      const nftURI = await nftContract.tokenURI(tokenId.toString());
+      const _theNftContract = [nftContract, nft2Contract].find(
+        (_nftContract) =>
+          _nftContract.target.toLowerCase() === collection.nftContractAddr
+      );
+      //console.log("what?", _theNftContract);
+      setTheNftContract(_theNftContract);
+
+      const nftURI = await _theNftContract.tokenURI(tokenId.toString());
       const response = await (await fetch(nftURI)).json();
       setName(response.name);
       setDescription(response.description);
@@ -103,7 +116,7 @@ export default function Nft() {
       }
     };
 
-    if (nftContract && tokenId) {
+    if (nftContract && nft2Contract && tokenId) {
       getNftUri();
     }
   }, []);

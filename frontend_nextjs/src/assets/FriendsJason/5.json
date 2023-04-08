@@ -1,0 +1,16 @@
+{
+    "id": "5",
+    "name": "Karen",
+    "description": "Friends in adventure",
+    "image": "https://ipfs.io/ipfs/QmPeYXTGPPQjHgW3LA3LZ1SAFDLH7nZsfAg4yx3MmteTaP/5.png",
+    "attributes": [
+      {
+        "trait_type": "personality",
+        "value": "mean"
+      },
+      {
+        "trait_type": "skill",
+        "value": "roasting people"
+      }
+    ]
+  }

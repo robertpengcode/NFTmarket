@@ -9,12 +9,17 @@ import Listing from "@/components/Listing";
 export default function Listings() {
   const router = useRouter();
   const { collectionContract } = router.query;
-  const { contract, walletAddress, provider, nftContract } = useGlobalContext();
+  //console.log("c", collectionContract);
+  const { contract, walletAddress, provider, nftContract, nft2Contract } =
+    useGlobalContext();
 
   const [selectedAttributes, setSelectedAttributes] = useState([]);
+  const [theNftContract, setTheNftContract] = useState(null);
 
   const { loading, error, data } = useSubgraph();
   const listingsArr = data ? data.listedNFTs : null;
+
+  //console.log("l", listingsArr);
 
   const collection = data
     ? data.createdCollections.find(
@@ -43,6 +48,14 @@ export default function Listings() {
       if (contract) {
         const _marketFeePercent = await contract.marketFeePercent();
         setMarketFeePercent(_marketFeePercent.toString());
+      }
+      if (nftContract && nft2Contract) {
+        const _theNftContract = [nftContract, nft2Contract].find(
+          (_nftContract) =>
+            _nftContract.target.toLowerCase() === collection.nftContractAddr
+        );
+        //console.log("what?", _theNftContract);
+        setTheNftContract(_theNftContract);
       }
     }
     updateUI();
@@ -101,7 +114,7 @@ export default function Listings() {
                   <Listing
                     key={id}
                     listing={listing}
-                    nftContract={nftContract}
+                    nftContract={theNftContract}
                     selectedAttributes={selectedAttributes}
                     marketFeePercent={marketFeePercent}
                     royaltyPercent={royaltyPercent}

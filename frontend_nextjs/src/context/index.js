@@ -2,12 +2,14 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { marketABI, marketAddress } from "../contract";
 import { boredStudentsABI, boredStudentsAddress } from "../contract";
+import { friendsABI, friendsAddress } from "../contract";
 
 const GlobalContext = createContext();
 
 export const GlobalContextProvider = ({ children }) => {
   const [contract, setContract] = useState(null);
   const [nftContract, setNftContract] = useState(null);
+  const [nft2Contract, setNft2Contract] = useState(null);
   const [walletAddress, setWalletAddress] = useState("");
   const [walletBalance, setWalletBalance] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
@@ -37,9 +39,15 @@ export const GlobalContextProvider = ({ children }) => {
         boredStudentsABI,
         signer
       );
+      const _nft2Contract = new ethers.Contract(
+        friendsAddress,
+        friendsABI,
+        signer
+      );
       setContract(newContract);
       setProvider(newProvider);
       setNftContract(_nftContract);
+      setNft2Contract(_nft2Contract);
       const owner = (await newContract.owner()).toLowerCase();
       const isAdmin = owner === accounts[0];
       setIsAdmin(isAdmin);
@@ -60,9 +68,15 @@ export const GlobalContextProvider = ({ children }) => {
       boredStudentsABI,
       signer
     );
+    const _nft2Contract = new ethers.Contract(
+      friendsAddress,
+      friendsABI,
+      signer
+    );
     setContract(newContract);
     setProvider(newProvider);
     setNftContract(_nftContract);
+    setNft2Contract(_nft2Contract);
     const owner = (await newContract.owner()).toLowerCase();
     const isAdmin = owner === account;
     setIsAdmin(isAdmin);
@@ -86,9 +100,15 @@ export const GlobalContextProvider = ({ children }) => {
         boredStudentsABI,
         signer
       );
+      const _nft2Contract = new ethers.Contract(
+        friendsAddress,
+        friendsABI,
+        signer
+      );
       setProvider(newProvider);
       setContract(newContract);
       setNftContract(_nftContract);
+      setNft2Contract(_nft2Contract);
       const owner = (await newContract.owner()).toLowerCase();
       const isAdmin = owner === accounts[0];
       setIsAdmin(isAdmin);
@@ -116,6 +136,7 @@ export const GlobalContextProvider = ({ children }) => {
       value={{
         contract,
         nftContract,
+        nft2Contract,
         walletAddress,
         walletBalance,
         connectWallet,

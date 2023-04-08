@@ -39,7 +39,7 @@ const styles = {
   // Card
   cardContainer:
     "flex flex-col w-[200px] h-[320px] items-center rounded-lg overflow-hidden shadow-lg mx-2 my-2 pb-2 bg-white hover:border-2 hover:border-sitePurple",
-  cardImage: "w-full",
+  cardImage: "w-auto h-auto",
   cardText: "font-righteous mb-1",
   cardButton:
     "font-righteous rounded-md bg-sitePurple hover:bg-purple-500 w-fit text-white p-1 mb-1 cursor-pointer disabled:bg-purple-300",
