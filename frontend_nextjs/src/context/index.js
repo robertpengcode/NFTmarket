@@ -3,7 +3,6 @@ import { ethers } from "ethers";
 import { marketABI, marketAddress } from "../contract";
 import { boredStudentsABI, boredStudentsAddress } from "../contract";
 import { friendsABI, friendsAddress } from "../contract";
-
 const GlobalContext = createContext();
 
 export const GlobalContextProvider = ({ children }) => {

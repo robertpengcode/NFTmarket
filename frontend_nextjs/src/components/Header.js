@@ -1,7 +1,6 @@
-import { useGlobalContext } from "../context";
 import { useState } from "react";
-
 import styles from "@/styles";
+import { useGlobalContext } from "../context";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -11,9 +10,8 @@ import matic from "../../public/matic.svg";
 export default function Header() {
   const { contract, walletAddress, walletBalance, connectWallet, isAdmin } =
     useGlobalContext();
-  const [selectTabId, setSelectTabId] = useState("0");
-
   const { route } = useRouter();
+  const [selectTabId, setSelectTabId] = useState("0");
 
   if (route === "/" && selectTabId !== "0") {
     setSelectTabId("0");
@@ -33,7 +31,6 @@ export default function Header() {
   };
 
   const handleTab = (e) => {
-    //console.log("ck", e.target.id);
     setSelectTabId(e.target.id);
   };
 

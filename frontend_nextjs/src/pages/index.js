@@ -1,13 +1,12 @@
-import Head from "next/head";
-
 import styles from "@/styles";
-//import { useGlobalContext } from "../context";
 import { useSubgraph } from "@/hooks/subgraph";
 import CollectionRow from "../components/CollectionRow";
 import Spinner from "@/components/Spinner";
+import Head from "next/head";
 
 export default function Home() {
   const { loading, error, data } = useSubgraph();
+
   const collectionsArr = data ? data.createdCollections : null;
 
   const listingsArr = data ? data.listedNFTs : null;

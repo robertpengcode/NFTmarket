@@ -1,21 +1,26 @@
-import styles from "@/styles";
-import Image from "next/image";
 import { useState, useEffect } from "react";
+import styles from "@/styles";
 import { useGlobalContext } from "../../context";
-import { useRouter } from "next/router";
 import { useSubgraph } from "@/hooks/subgraph";
 import { ethers } from "ethers";
+import { useRouter } from "next/router";
+import Image from "next/image";
 
 export default function Nft() {
   const { contract, walletAddress, nftContract, nft2Contract } =
     useGlobalContext();
+  const { loading, error, data } = useSubgraph();
   const router = useRouter();
   const { collectionContract, tokenId } = router.query;
-
-  const { loading, error, data } = useSubgraph();
-
   const [attributesCount, setAttributesCount] = useState(null);
   const [theNftContract, setTheNftContract] = useState(null);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [nftImgURL, setNftImgURL] = useState("");
+  const [attributes, setAttributes] = useState([]);
+  const [collectionName, setCollectionName] = useState("");
+  const [team, setTeam] = useState("");
+  const [marketFeePercent, setMarketFeePercent] = useState("");
 
   const collection = data
     ? data.createdCollections.find(
@@ -80,21 +85,12 @@ export default function Nft() {
   };
   const showSeller = seller ? convertAddress(seller) : "";
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [nftImgURL, setNftImgURL] = useState("");
-  const [attributes, setAttributes] = useState([]);
-  const [collectionName, setCollectionName] = useState("");
-  const [team, setTeam] = useState("");
-  const [marketFeePercent, setMarketFeePercent] = useState("");
-
   useEffect(() => {
     const getNftUri = async () => {
       const _theNftContract = [nftContract, nft2Contract].find(
         (_nftContract) =>
           _nftContract.target.toLowerCase() === collection.nftContractAddr
       );
-      //console.log("what?", _theNftContract);
       setTheNftContract(_theNftContract);
 
       const nftURI = await _theNftContract.tokenURI(tokenId.toString());
@@ -131,8 +127,6 @@ export default function Nft() {
   const showPrice = totalPrice ? ethers.formatEther(totalPrice) : "";
 
   const handleBuy = async () => {
-    console.log("buy buy");
-    console.log("t", totalPrice);
     if (contract) {
       try {
         await contract.buyNFT(nftContractAddr, tokenId, { value: totalPrice });

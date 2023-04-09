@@ -1,15 +1,14 @@
-import { ethers } from "ethers";
-import styles from "@/styles";
 import { useState, useEffect } from "react";
+import styles from "@/styles";
 import { useGlobalContext } from "../context";
 import { useSubgraph } from "@/hooks/subgraph";
+import { ethers } from "ethers";
 import UserWithdraw from "@/components/UserWithdraw";
 
 export default function SellNFT() {
-  const { loading, error, data } = useSubgraph();
-  const collectionsArr = data ? data.createdCollections : null;
   const { contract, walletAddress, nftContract, nft2Contract } =
     useGlobalContext();
+  const { loading, error, data } = useSubgraph();
   const [collectionName, setCollectionName] = useState("");
   const [collectionAddr, setCollectionAddr] = useState("");
   const [tokenId, setTokenId] = useState("");
@@ -18,8 +17,8 @@ export default function SellNFT() {
   const [collectionNamesArr, setCollectionNamesArr] = useState([]);
   const [collectionAddrsArr, setCollectionAddrsArr] = useState([]);
   const [theNftContract, setTheNftContract] = useState(null);
-  //console.log("the", theNftContract);
-  //console.log("1", nftContract, "2", nft2Contract);
+
+  const collectionsArr = data ? data.createdCollections : null;
 
   async function updateUI() {
     const _collectionNamesArr = [];
@@ -50,13 +49,11 @@ export default function SellNFT() {
   const handleCollectionAddr = (name) => {
     if (collectionNamesArr.includes(name)) {
       const id = collectionNamesArr.indexOf(name);
-      //console.log("ck", collectionAddrsArr[id]);
       setCollectionAddr(collectionAddrsArr[id]);
       const _theNftContract = [nftContract, nft2Contract].find(
         (_nftContract) =>
           _nftContract.target.toLowerCase() === collectionAddrsArr[id]
       );
-      //console.log("what?", _theNftContract);
       setTheNftContract(_theNftContract);
     } else {
       setCollectionAddr("xxxx");

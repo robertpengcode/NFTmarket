@@ -1,8 +1,8 @@
 import styles from "@/styles";
-import Image from "next/image";
-import { ethers } from "ethers";
-import Link from "next/link";
 import { useGlobalContext } from "../context";
+import { ethers } from "ethers";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function Card({
   imgURL,
@@ -13,9 +13,11 @@ export default function Card({
   nftContractAddr,
 }) {
   const { contract } = useGlobalContext();
+
   const convertAddress = (addr) => {
     return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
   };
+
   const showSellerAddress = !seller
     ? ""
     : seller === walletAddress

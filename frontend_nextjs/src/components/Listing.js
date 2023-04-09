@@ -13,16 +13,11 @@ export default function Listing({
   const [nftImgURL, setNftImgURL] = useState("");
   const [showNFT, setShowNFT] = useState(true);
 
-  //console.log("ll", listing);
-  //console.log("s", showNFT);
-  //console.log("sele", selectedAttributes);
-
   const { nftContractAddr, tokenId, seller, price } = listing;
 
   const getNftUri = async () => {
     const nftURI = await nftContract.tokenURI(tokenId.toString());
     const response = await (await fetch(nftURI)).json();
-    //console.log("res", response);
     setShowNFT(checkAttributes(response.attributes));
     setNftImgURL(response.image);
   };
@@ -42,7 +37,6 @@ export default function Listing({
     return true;
   }
 
-  //console.log("p", price, typeof price);
   const totalPrice = (
     (price * (100 + Number(marketFeePercent) + Number(royaltyPercent))) /
     100

@@ -1,8 +1,9 @@
-import styles from "@/styles";
 import { useState } from "react";
+import styles from "@/styles";
 
 export default function AttributeElement({ option, setSelectedAttributes }) {
   const [checked, setChecked] = useState(true);
+
   const handleCheckbox = (e) => {
     setChecked((pre) => !pre);
     const { value, checked } = e.target;
@@ -12,6 +13,7 @@ export default function AttributeElement({ option, setSelectedAttributes }) {
       setSelectedAttributes((pre) => pre.filter((opt) => opt !== value));
     }
   };
+
   return (
     <form className={styles.listAttributesMenuForm}>
       <input

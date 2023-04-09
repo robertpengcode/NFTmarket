@@ -1,8 +1,8 @@
-import styles from "@/styles";
 import { useState, useEffect } from "react";
+import styles from "@/styles";
+import { ethers } from "ethers";
 import Image from "next/image";
 import Link from "next/link";
-import { ethers } from "ethers";
 
 export default function CollectionRow({ collection, listingsArr }) {
   const [name, setName] = useState("");

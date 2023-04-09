@@ -1,5 +1,5 @@
-import styles from "@/styles";
 import { useState } from "react";
+import styles from "@/styles";
 import AttributeMenu from "@/components/AttributeMenu";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";

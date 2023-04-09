@@ -1,5 +1,5 @@
-import styles from "@/styles";
 import { useState } from "react";
+import styles from "@/styles";
 import { useGlobalContext } from "../context";
 import OwnerWithdraw from "../components/OwnerWithdraw";
 

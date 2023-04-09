@@ -1,5 +1,5 @@
-import styles from "@/styles";
 import { useState, useEffect } from "react";
+import styles from "@/styles";
 import { useGlobalContext } from "../context";
 import { ethers } from "ethers";
 

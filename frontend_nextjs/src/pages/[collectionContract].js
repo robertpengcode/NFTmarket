@@ -1,25 +1,27 @@
-import styles from "@/styles";
 import { useState, useEffect } from "react";
+import styles from "@/styles";
 import { useGlobalContext } from "../context";
+import { useSubgraph } from "@/hooks/subgraph";
 import { useRouter } from "next/router";
 import AttributeBox from "@/components/AttributeBox";
-import { useSubgraph } from "@/hooks/subgraph";
 import Listing from "@/components/Listing";
 
 export default function Listings() {
-  const router = useRouter();
-  const { collectionContract } = router.query;
-  //console.log("c", collectionContract);
   const { contract, walletAddress, provider, nftContract, nft2Contract } =
     useGlobalContext();
+  const { loading, error, data } = useSubgraph();
+  const router = useRouter();
+  const { collectionContract } = router.query;
 
   const [selectedAttributes, setSelectedAttributes] = useState([]);
   const [theNftContract, setTheNftContract] = useState(null);
+  const [name, setName] = useState("");
+  const [team, setTeam] = useState("");
+  const [description, setDescription] = useState("");
+  const [attributes, setAttributes] = useState([]);
+  const [marketFeePercent, setMarketFeePercent] = useState("");
 
-  const { loading, error, data } = useSubgraph();
   const listingsArr = data ? data.listedNFTs : null;
-
-  //console.log("l", listingsArr);
 
   const collection = data
     ? data.createdCollections.find(
@@ -28,12 +30,6 @@ export default function Listings() {
     : null;
 
   const { collectionURI, royaltyPercent } = collection ? collection : "";
-
-  const [name, setName] = useState("");
-  const [team, setTeam] = useState("");
-  const [description, setDescription] = useState("");
-  const [attributes, setAttributes] = useState([]);
-  const [marketFeePercent, setMarketFeePercent] = useState("");
 
   useEffect(() => {
     async function updateUI() {
@@ -54,7 +50,6 @@ export default function Listings() {
           (_nftContract) =>
             _nftContract.target.toLowerCase() === collection.nftContractAddr
         );
-        //console.log("what?", _theNftContract);
         setTheNftContract(_theNftContract);
       }
     }
