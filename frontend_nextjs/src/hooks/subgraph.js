@@ -1,19 +1,21 @@
 import { gql, useQuery } from "@apollo/client";
 const GET_NFTmarket_ITEMS = gql`
   {
-    createdCollections(first: 5) {
+    createdCollections(first: 5, orderBy: time) {
       id
       nftContractAddr
       royaltyAddr
       royaltyPercent
       collectionURI
+      time
     }
-    listedNFTs(first: 20) {
+    listedNFTs(first: 25, orderBy: time) {
       id
       nftContractAddr
       tokenId
       seller
       price
+      time
     }
   }
 `;
