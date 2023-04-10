@@ -12,7 +12,7 @@ export default function Card({
   walletAddress,
   nftContractAddr,
 }) {
-  const { contract } = useGlobalContext();
+  const { contract, setShowAlert, setUpdateUI } = useGlobalContext();
 
   const convertAddress = (addr) => {
     return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
@@ -27,7 +27,26 @@ export default function Card({
   const handleBuy = async () => {
     if (contract) {
       try {
-        await contract.buyNFT(nftContractAddr, tokenId, { value: totalPrice });
+        const answer = await contract.buyNFT(nftContractAddr, tokenId, {
+          value: totalPrice,
+        });
+        if (answer) {
+          setShowAlert({
+            status: true,
+            type: "info",
+            message: `Request sent! Please wait a few seconds for confirmation.`,
+          });
+        }
+        contract.on("BoughtNFT", (nftContractAddr, tokenId, buyer) => {
+          setShowAlert({
+            status: true,
+            type: "success",
+            message: `Token (${tokenId}) is bought by (${convertAddress(
+              buyer
+            )}).`,
+          });
+          setUpdateUI((pre) => !pre);
+        });
       } catch (error) {
         console.log(error);
       }

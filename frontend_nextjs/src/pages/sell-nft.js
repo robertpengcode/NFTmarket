@@ -4,10 +4,18 @@ import { useGlobalContext } from "../context";
 import { useSubgraph } from "@/hooks/subgraph";
 import { ethers } from "ethers";
 import UserWithdraw from "@/components/UserWithdraw";
+import Alert from "@/components/Alert";
 
 export default function SellNFT() {
-  const { contract, walletAddress, nftContract, nft2Contract } =
-    useGlobalContext();
+  const {
+    contract,
+    walletAddress,
+    nftContract,
+    nft2Contract,
+    showAlert,
+    setShowAlert,
+    setUpdateUI,
+  } = useGlobalContext();
   const { loading, error, data } = useSubgraph();
   const [collectionName, setCollectionName] = useState("");
   const [collectionAddr, setCollectionAddr] = useState("");
@@ -17,6 +25,10 @@ export default function SellNFT() {
   const [collectionNamesArr, setCollectionNamesArr] = useState([]);
   const [collectionAddrsArr, setCollectionAddrsArr] = useState([]);
   const [theNftContract, setTheNftContract] = useState(null);
+
+  const convertAddress = (addr) => {
+    return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
+  };
 
   const collectionsArr = data ? data.createdCollections : null;
 
@@ -101,7 +113,23 @@ export default function SellNFT() {
   const approve = async () => {
     if (theNftContract) {
       try {
-        await theNftContract.approve(contract.target, tokenId);
+        const answer = await theNftContract.approve(contract.target, tokenId);
+        if (answer) {
+          setShowAlert({
+            status: true,
+            type: "info",
+            message: `Request sent! Please wait a few seconds for confirmation.`,
+          });
+        }
+        theNftContract.on("Approval", (owner, approved, tokenId) => {
+          setShowAlert({
+            status: true,
+            type: "success",
+            message: `Token (${tokenId}) is Approved to the market (${convertAddress(
+              approved
+            )}).`,
+          });
+        });
       } catch (error) {
         console.log(error);
       }
@@ -112,7 +140,28 @@ export default function SellNFT() {
     const priceInWei = ethers.parseEther(price);
     if (contract) {
       try {
-        await contract.listNFT(collectionAddr, tokenId, priceInWei);
+        const answer = await contract.listNFT(
+          collectionAddr,
+          tokenId,
+          priceInWei
+        );
+        if (answer) {
+          setShowAlert({
+            status: true,
+            type: "info",
+            message: `Request sent! Please wait a few seconds for confirmation.`,
+          });
+        }
+        contract.on("ListedNFT", (nftContractAddr, tokenId, seller) => {
+          setShowAlert({
+            status: true,
+            type: "success",
+            message: `Token (${tokenId}) is listed to the market (${convertAddress(
+              nftContractAddr
+            )}) for sale by the seller (${convertAddress(seller)}).`,
+          });
+          setUpdateUI((pre) => !pre);
+        });
       } catch (error) {
         console.log(error);
       }
@@ -123,7 +172,31 @@ export default function SellNFT() {
     const priceInWei = ethers.parseEther(price);
     if (contract) {
       try {
-        await contract.updateListingPrice(collectionAddr, tokenId, priceInWei);
+        const answer = await contract.updateListingPrice(
+          collectionAddr,
+          tokenId,
+          priceInWei
+        );
+        if (answer) {
+          setShowAlert({
+            status: true,
+            type: "info",
+            message: `Request sent! Please wait a few seconds for confirmation.`,
+          });
+        }
+        contract.on(
+          "UpdatedListingPrice",
+          (nftContractAddr, tokenId, newPrice) => {
+            setShowAlert({
+              status: true,
+              type: "success",
+              message: `Token (${tokenId})'s price is updated to ${ethers.formatEther(
+                newPrice
+              )} Matic.`,
+            });
+            setUpdateUI((pre) => !pre);
+          }
+        );
       } catch (error) {
         console.log(error);
       }
@@ -133,7 +206,22 @@ export default function SellNFT() {
   const cancelList = async () => {
     if (contract) {
       try {
-        await contract.deleteListing(collectionAddr, tokenId);
+        const answer = await contract.deleteListing(collectionAddr, tokenId);
+        if (answer) {
+          setShowAlert({
+            status: true,
+            type: "info",
+            message: `Request sent! Please wait a few seconds for confirmation.`,
+          });
+        }
+        contract.on("DeletedListing", (nftContractAddr, tokenId) => {
+          setShowAlert({
+            status: true,
+            type: "success",
+            message: `Token (${tokenId}) is removed from the list.`,
+          });
+          setUpdateUI((pre) => !pre);
+        });
       } catch (error) {
         console.log(error);
       }
@@ -142,6 +230,9 @@ export default function SellNFT() {
 
   return (
     <div className={styles.pageContainer}>
+      {showAlert?.status && (
+        <Alert type={showAlert.type} message={showAlert.message} />
+      )}
       <div className={styles.sellContainer}>
         <div className={styles.sellTabsBox} onClick={(e) => handleTab(e)}>
           <div

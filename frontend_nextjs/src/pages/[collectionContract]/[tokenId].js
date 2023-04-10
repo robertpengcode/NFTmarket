@@ -5,10 +5,18 @@ import { useSubgraph } from "@/hooks/subgraph";
 import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import Alert from "@/components/Alert";
 
 export default function Nft() {
-  const { contract, walletAddress, nftContract, nft2Contract } =
-    useGlobalContext();
+  const {
+    contract,
+    walletAddress,
+    nftContract,
+    nft2Contract,
+    showAlert,
+    setShowAlert,
+    setUpdateUI,
+  } = useGlobalContext();
   const { loading, error, data } = useSubgraph();
   const router = useRouter();
   const { collectionContract, tokenId } = router.query;
@@ -83,7 +91,12 @@ export default function Nft() {
   const convertAddress = (addr) => {
     return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
   };
-  const showSeller = seller ? convertAddress(seller) : "";
+
+  const showSeller = !seller
+    ? ""
+    : seller === walletAddress
+    ? "You"
+    : convertAddress(seller);
 
   useEffect(() => {
     const getNftUri = async () => {
@@ -129,7 +142,26 @@ export default function Nft() {
   const handleBuy = async () => {
     if (contract) {
       try {
-        await contract.buyNFT(nftContractAddr, tokenId, { value: totalPrice });
+        const answer = await contract.buyNFT(nftContractAddr, tokenId, {
+          value: totalPrice,
+        });
+        if (answer) {
+          setShowAlert({
+            status: true,
+            type: "info",
+            message: `Request sent! Please wait a few seconds for confirmation.`,
+          });
+        }
+        contract.on("BoughtNFT", (nftContractAddr, tokenId, buyer) => {
+          setShowAlert({
+            status: true,
+            type: "success",
+            message: `Token (${tokenId}) is bought by (${convertAddress(
+              buyer
+            )}).`,
+          });
+          setUpdateUI((pre) => !pre);
+        });
       } catch (error) {
         console.log(error);
       }
@@ -138,6 +170,9 @@ export default function Nft() {
 
   return (
     <div className={styles.pageContainer}>
+      {showAlert?.status && (
+        <Alert type={showAlert.type} message={showAlert.message} />
+      )}
       <div className={styles.nftContainer}>
         <div className={styles.nftInfoLeft}>
           <div className={styles.nftInfoLeftItem}>{collectionName}</div>

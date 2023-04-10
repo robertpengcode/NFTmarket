@@ -9,7 +9,7 @@ const GET_NFTmarket_ITEMS = gql`
       collectionURI
       time
     }
-    listedNFTs(first: 25, orderBy: time) {
+    listedNFTs(first: 25, orderBy: time, orderDirection: desc) {
       id
       nftContractAddr
       tokenId
@@ -21,6 +21,6 @@ const GET_NFTmarket_ITEMS = gql`
 `;
 
 export const useSubgraph = () => {
-  const { loading, error, data } = useQuery(GET_NFTmarket_ITEMS);
-  return { loading, error, data };
+  const { loading, error, data, refetch } = useQuery(GET_NFTmarket_ITEMS);
+  return { loading, error, data, refetch };
 };

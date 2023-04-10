@@ -4,10 +4,11 @@ import { useGlobalContext } from "../context";
 import { ethers } from "ethers";
 
 export default function OwnerWithdraw() {
-  const { contract, walletAddress } = useGlobalContext();
+  const { contract, walletAddress, setShowAlert } = useGlobalContext();
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [contractBalance, setContractBalance] = useState("");
   const [ownerBalance, setOwnerBalance] = useState("");
+  const [updateBalance, setUpdateBalance] = useState(false);
 
   useEffect(() => {
     const getBalance = async () => {
@@ -21,7 +22,7 @@ export default function OwnerWithdraw() {
       }
     };
     getBalance();
-  }, []);
+  }, [updateBalance]);
 
   const convertAddress = (addr) => {
     return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
@@ -33,7 +34,24 @@ export default function OwnerWithdraw() {
     const withdrawInWei = ethers.parseEther(withdrawAmount);
     if (contract) {
       try {
-        await contract.ownerWithdrawFee(withdrawInWei);
+        const answer = await contract.ownerWithdrawFee(withdrawInWei);
+        if (answer) {
+          setShowAlert({
+            status: true,
+            type: "info",
+            message: `Request sent! Please wait a few seconds for confirmation.`,
+          });
+        }
+        contract.on("MarketOwnerWithdrew", (owner, amount) => {
+          setShowAlert({
+            status: true,
+            type: "success",
+            message: `User (${convertAddress(
+              owner
+            )}) withdrew ${ethers.formatEther(amount)} MATIC.`,
+          });
+          setUpdateBalance((pre) => !pre);
+        });
       } catch (error) {
         console.log(error);
       }

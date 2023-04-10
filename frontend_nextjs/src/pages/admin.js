@@ -2,9 +2,17 @@ import { useState } from "react";
 import styles from "@/styles";
 import { useGlobalContext } from "../context";
 import OwnerWithdraw from "../components/OwnerWithdraw";
+import Alert from "@/components/Alert";
 
 export default function Admin() {
-  const { contract, walletAddress, isAdmin } = useGlobalContext();
+  const {
+    contract,
+    walletAddress,
+    isAdmin,
+    showAlert,
+    setShowAlert,
+    setUpdateUI,
+  } = useGlobalContext();
   const [selectTabId, setSelectTabId] = useState("0");
   const [collectionName, setCollectionName] = useState("");
   const [collectionAddr, setCollectionAddr] = useState("");
@@ -30,6 +38,10 @@ export default function Admin() {
   const [maxSupply, setMaxSupply] = useState("");
   const [team, setTeam] = useState("");
   const [collectionJason, setCollectionJason] = useState("");
+
+  const convertAddress = (addr) => {
+    return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
+  };
 
   const handleTab = (e) => {
     setSelectTabId(e.target.id);
@@ -97,12 +109,29 @@ export default function Admin() {
   const createCollection = async () => {
     if (contract) {
       try {
-        await contract.createCollection(
+        const answer = await contract.createCollection(
           collectionAddr,
           royaltyAddr,
           royaltyPercent,
           collectionURL
         );
+        if (answer) {
+          setShowAlert({
+            status: true,
+            type: "info",
+            message: `Request sent! Please wait a few seconds for confirmation.`,
+          });
+        }
+        contract.on("CreatedCollection", (nftContractAddr) => {
+          setShowAlert({
+            status: true,
+            type: "success",
+            message: `Collection (${convertAddress(
+              nftContractAddr
+            )}) is created.`,
+          });
+          setUpdateUI((pre) => !pre);
+        });
       } catch (error) {
         console.log(error);
       }
@@ -112,12 +141,29 @@ export default function Admin() {
   const updateCollection = async () => {
     if (contract) {
       try {
-        await contract.updateCollection(
+        const answer = await contract.updateCollection(
           collectionAddr,
           royaltyAddr,
           royaltyPercent,
           collectionURL
         );
+        if (answer) {
+          setShowAlert({
+            status: true,
+            type: "info",
+            message: `Request sent! Please wait a few seconds for confirmation.`,
+          });
+        }
+        contract.on("UpdatedCollection", (nftContractAddr) => {
+          setShowAlert({
+            status: true,
+            type: "success",
+            message: `Collection (${convertAddress(
+              nftContractAddr
+            )}) is updated.`,
+          });
+          setUpdateUI((pre) => !pre);
+        });
       } catch (error) {
         console.log(error);
       }
@@ -127,7 +173,24 @@ export default function Admin() {
   const deleteCollection = async () => {
     if (contract) {
       try {
-        await contract.deleteCollection(collectionAddr);
+        const answer = await contract.deleteCollection(collectionAddr);
+        if (answer) {
+          setShowAlert({
+            status: true,
+            type: "info",
+            message: `Request sent! Please wait a few seconds for confirmation.`,
+          });
+        }
+        contract.on("DeletedCollection", (nftContractAddr) => {
+          setShowAlert({
+            status: true,
+            type: "success",
+            message: `Collection (${convertAddress(
+              nftContractAddr
+            )}) is delected.`,
+          });
+          setUpdateUI((pre) => !pre);
+        });
       } catch (error) {
         console.log(error);
       }
@@ -172,6 +235,9 @@ export default function Admin() {
 
   return !isAdmin ? null : (
     <div className={styles.pageContainer}>
+      {showAlert?.status && (
+        <Alert type={showAlert.type} message={showAlert.message} />
+      )}
       <div className={styles.sellContainer}>
         <div className={styles.sellTabsBox} onClick={(e) => handleTab(e)}>
           <div

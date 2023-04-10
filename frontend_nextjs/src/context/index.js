@@ -13,6 +13,22 @@ export const GlobalContextProvider = ({ children }) => {
   const [walletBalance, setWalletBalance] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [provider, setProvider] = useState(null);
+  const [showAlert, setShowAlert] = useState({
+    status: false,
+    type: "info",
+    message: "",
+  });
+  const [updateUI, setUpdateUI] = useState(false);
+
+  //* Handle alerts
+  useEffect(() => {
+    if (showAlert?.status) {
+      const timer = setTimeout(() => {
+        setShowAlert({ status: false, type: "info", message: "" });
+      }, [5000]);
+      return () => clearTimeout(timer);
+    }
+  }, [showAlert]);
 
   //* Set the wallet address to the state
   const updateAddress = async (accounts) => {
@@ -141,6 +157,9 @@ export const GlobalContextProvider = ({ children }) => {
         connectWallet,
         isAdmin,
         provider,
+        showAlert,
+        setShowAlert,
+        updateUI,
       }}
     >
       {children}

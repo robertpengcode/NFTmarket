@@ -88,7 +88,7 @@ const styles = {
 
   // Forms on Sell-NFT page
   sellContainer:
-    "flex flex-col font-righteous mt-2 m-2 p-2 rounded-lg bg-white w-[70%] shadow-md",
+    "flex flex-col font-righteous m-4 p-2 rounded-lg bg-white w-[70%] shadow-md",
   sellTabsBox: "flex flex-row m-1",
   sellTab:
     "text-1xl border-b-[3px] mr-4 my-1 p-1 cursor-pointer hover:bg-purple-200 hover:rounded-t-md",
@@ -108,6 +108,15 @@ const styles = {
   // Footer
   footerContainer: "flex items-center justify-center bg-purple-200",
   footerText: "font-righteous",
+
+  // alert
+  info: "text-blue-700 bg-blue-100 dark:bg-blue-200 dark:text-blue-800",
+  success: "text-green-700 bg-green-100 dark:bg-green-200 dark:text-green-800",
+  failure:
+    "text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800",
+  alertContainer: "absolute z-10 top-[80px] w-[70%] left-[15%]",
+  alertWrapper: "p-2 rounded-lg font-play font-semibold text-lg ",
+  alertIcon: "flex-shrink-0 inline w-6 h-6 mr-2",
 };
 
 export default styles;

@@ -5,10 +5,18 @@ import { useSubgraph } from "@/hooks/subgraph";
 import { useRouter } from "next/router";
 import AttributeBox from "@/components/AttributeBox";
 import Listing from "@/components/Listing";
+import Alert from "@/components/Alert";
 
 export default function Listings() {
-  const { contract, walletAddress, provider, nftContract, nft2Contract } =
-    useGlobalContext();
+  const {
+    contract,
+    walletAddress,
+    provider,
+    nftContract,
+    nft2Contract,
+    showAlert,
+    setShowAlert,
+  } = useGlobalContext();
   const { loading, error, data } = useSubgraph();
   const router = useRouter();
   const { collectionContract } = router.query;
@@ -63,6 +71,9 @@ export default function Listings() {
 
   return (
     <div className={styles.pageContainer}>
+      {showAlert?.status && (
+        <Alert type={showAlert.type} message={showAlert.message} />
+      )}
       <div className={styles.listContainer}>
         <div className={styles.listCollectionInfoContainer}>
           <div className={styles.listCollectionInfoRow}>

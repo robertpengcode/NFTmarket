@@ -4,8 +4,9 @@ import { useGlobalContext } from "../context";
 import { ethers } from "ethers";
 
 export default function UserWithdraw() {
-  const { contract, walletAddress } = useGlobalContext();
+  const { contract, walletAddress, setShowAlert } = useGlobalContext();
   const [userBalance, setUserBalance] = useState("");
+  const [updateBalance, setUpdateBalance] = useState(false);
 
   useEffect(() => {
     const getUserBalance = async () => {
@@ -17,7 +18,7 @@ export default function UserWithdraw() {
       }
     };
     getUserBalance();
-  }, []);
+  }, [updateBalance]);
 
   const convertAddress = (addr) => {
     return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
@@ -27,7 +28,24 @@ export default function UserWithdraw() {
   const handleUserWithdraw = async () => {
     if (contract) {
       try {
-        await contract.usersWithdraw();
+        const answer = await contract.usersWithdraw();
+        if (answer) {
+          setShowAlert({
+            status: true,
+            type: "info",
+            message: `Request sent! Please wait a few seconds for confirmation.`,
+          });
+        }
+        contract.on("UserWithdrew", (user, amount) => {
+          setShowAlert({
+            status: true,
+            type: "success",
+            message: `User (${convertAddress(
+              user
+            )}) withdrew ${ethers.formatEther(amount)} MATIC.`,
+          });
+          setUpdateBalance((pre) => !pre);
+        });
       } catch (error) {
         console.log(error);
       }
