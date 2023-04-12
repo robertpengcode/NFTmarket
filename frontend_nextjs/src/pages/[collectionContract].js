@@ -62,7 +62,13 @@ export default function Listings() {
       }
     }
     updateUI();
-  }, []);
+  }, [
+    collection.nftContractAddr,
+    collectionURI,
+    contract,
+    nft2Contract,
+    nftContract,
+  ]);
 
   function processAttributes(obj) {
     const resultArr = Object.values(obj).flat();

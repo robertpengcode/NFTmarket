@@ -19,7 +19,7 @@ export default function UserWithdraw() {
       }
     };
     getUserBalance();
-  }, [updateBalance, walletAddress]);
+  }, [updateBalance, walletAddress, contract]);
 
   const convertAddress = (addr) => {
     return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
@@ -70,7 +70,7 @@ export default function UserWithdraw() {
     >
       <div className="flex flex-row my-1">
         <p className={styles.sellFormLabel}>
-          User({showWalletAddress})'s Proceed in the Contract:{" "}
+          User({showWalletAddress}) Proceed in the Contract:{" "}
         </p>
         <p className={styles.sellFormLabel}>
           {userBalance ? ethers.formatEther(userBalance) : ""} MATIC

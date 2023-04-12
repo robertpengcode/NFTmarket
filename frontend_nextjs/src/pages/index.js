@@ -16,7 +16,7 @@ export default function Home() {
 
   useEffect(() => {
     refetch();
-  }, [updateUI]);
+  }, [updateUI, refetch]);
 
   return (
     <>

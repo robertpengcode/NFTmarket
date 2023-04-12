@@ -23,7 +23,7 @@ export default function OwnerWithdraw() {
       }
     };
     getBalance();
-  }, [updateBalance]);
+  }, [updateBalance, contract]);
 
   const convertAddress = (addr) => {
     return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
@@ -77,7 +77,7 @@ export default function OwnerWithdraw() {
     >
       <div className="flex flex-row my-1">
         <p className={styles.sellFormLabel}>
-          Contract({showContractAddress})'s Balance:{" "}
+          Contract({showContractAddress}) Balance:{" "}
         </p>
         <p className={styles.sellFormLabel}>
           {contractBalance ? ethers.formatEther(contractBalance) : ""} MATIC
@@ -85,7 +85,7 @@ export default function OwnerWithdraw() {
       </div>
       <div className="flex flex-row my-1">
         <p className={styles.sellFormLabel}>
-          Owner({showWalletAddress})'s Balance in the Contract:{" "}
+          Owner({showWalletAddress}) Balance in the Contract:{" "}
         </p>
         <p className={styles.sellFormLabel}>
           {ownerBalance ? ethers.formatEther(ownerBalance) : ""} MATIC

@@ -98,7 +98,7 @@ export default function Nft() {
     if (listingsArr) {
       calculateRarity(listingsArr);
     }
-  }, []);
+  }, [collection.nftContractAddr, listingsArr, nft2Contract, nftContract]);
 
   useEffect(() => {
     const getNftUri = async () => {
@@ -130,7 +130,14 @@ export default function Nft() {
     if (nftContract && nft2Contract && tokenId) {
       getNftUri();
     }
-  }, []);
+  }, [
+    collection.nftContractAddr,
+    collectionURI,
+    contract,
+    nft2Contract,
+    nftContract,
+    tokenId,
+  ]);
 
   const convertAddress = (addr) => {
     return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
