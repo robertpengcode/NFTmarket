@@ -72,7 +72,8 @@ export default function Nft() {
     const calculateRarity = async (listings) => {
       const _theNftContract = [nftContract, nft2Contract].find(
         (_nftContract) =>
-          _nftContract.target.toLowerCase() === collection.nftContractAddr
+          //_nftContract.target.toLowerCase() === collection.nftContractAddr
+          _nftContract.target.toLowerCase() === collectionContract
       );
       const result = {};
       for (let i = 0; i < listings.length; i++) {
@@ -98,13 +99,14 @@ export default function Nft() {
     if (listingsArr) {
       calculateRarity(listingsArr);
     }
-  }, [collection.nftContractAddr, listingsArr, nft2Contract, nftContract]);
+  }, [collectionContract, listingsArr, nft2Contract, nftContract]);
 
   useEffect(() => {
     const getNftUri = async () => {
       const _theNftContract = [nftContract, nft2Contract].find(
         (_nftContract) =>
-          _nftContract.target.toLowerCase() === collection.nftContractAddr
+          _nftContract.target.toLowerCase() === collectionContract
+        //_nftContract.target.toLowerCase() === collection.nftContractAddr
       );
       setTheNftContract(_theNftContract);
 
@@ -131,7 +133,7 @@ export default function Nft() {
       getNftUri();
     }
   }, [
-    collection.nftContractAddr,
+    collectionContract,
     collectionURI,
     contract,
     nft2Contract,

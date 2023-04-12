@@ -51,7 +51,7 @@ export default function CollectionRow({ collection, listingsArr }) {
       }
     };
     updateUI();
-  }, []);
+  }, [collectionURI]);
 
   return !collection ? (
     <div>No Collection</div>
