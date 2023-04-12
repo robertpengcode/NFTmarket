@@ -56,19 +56,13 @@ export default function Listings() {
       if (nftContract && nft2Contract) {
         const _theNftContract = [nftContract, nft2Contract].find(
           (_nftContract) =>
-            _nftContract.target.toLowerCase() === collection.nftContractAddr
+            _nftContract.target.toLowerCase() === collectionContract
         );
         setTheNftContract(_theNftContract);
       }
     }
     updateUI();
-  }, [
-    collection.nftContractAddr,
-    collectionURI,
-    contract,
-    nft2Contract,
-    nftContract,
-  ]);
+  }, [collectionContract, collectionURI, contract, nft2Contract, nftContract]);
 
   function processAttributes(obj) {
     const resultArr = Object.values(obj).flat();
