@@ -4,7 +4,8 @@ import { useGlobalContext } from "../context";
 import { ethers } from "ethers";
 
 export default function UserWithdraw() {
-  const { contract, walletAddress, setShowAlert } = useGlobalContext();
+  const { contract, walletAddress, setShowAlert, provider, setWalletBalance } =
+    useGlobalContext();
   const [userBalance, setUserBalance] = useState("");
   const [updateBalance, setUpdateBalance] = useState(false);
 
@@ -18,12 +19,18 @@ export default function UserWithdraw() {
       }
     };
     getUserBalance();
-  }, [updateBalance]);
+  }, [updateBalance, walletAddress]);
 
   const convertAddress = (addr) => {
     return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
   };
   const showWalletAddress = walletAddress ? convertAddress(walletAddress) : "";
+
+  const updateAccountBalance = async () => {
+    const balance = (await provider.getBalance(walletAddress)).toString();
+    const balanceInETH = ethers.formatEther(balance);
+    setWalletBalance(balanceInETH);
+  };
 
   const handleUserWithdraw = async () => {
     if (contract) {
@@ -45,6 +52,7 @@ export default function UserWithdraw() {
             )}) withdrew ${ethers.formatEther(amount)} MATIC.`,
           });
           setUpdateBalance((pre) => !pre);
+          updateAccountBalance();
         });
       } catch (error) {
         console.log(error);

@@ -82,9 +82,12 @@ const styles = {
   nftAttributesContainer: "flex flex-row flex-wrap",
   nftAttributeBox:
     "flex flex-col items-center w-[200px] border-[2px] border-dashed border-purple-400 m-2 rounded-md p-2 hover:bg-purple-200",
+
   nftAttributeKey: "text-siteWhite",
   nftAttributeValue: "",
   nftAttributeRare: "text-sm",
+  nftChartContainer:
+    "border-[2px] border-dashed border-purple-400 m-2 rounded-md w-fit p-2 hover:bg-purple-200",
 
   // Forms on Sell-NFT page
   sellContainer:

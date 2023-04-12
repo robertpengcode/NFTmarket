@@ -154,6 +154,7 @@ export const GlobalContextProvider = ({ children }) => {
         nft2Contract,
         walletAddress,
         walletBalance,
+        setWalletBalance,
         connectWallet,
         isAdmin,
         provider,

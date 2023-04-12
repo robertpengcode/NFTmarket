@@ -17,6 +17,15 @@ const GET_NFTmarket_ITEMS = gql`
       price
       time
     }
+    boughtNFTs(first: 50, orderBy: time) {
+      id
+      nftContractAddr
+      tokenId
+      buyer
+      seller
+      price
+      time
+    }
   }
 `;
 

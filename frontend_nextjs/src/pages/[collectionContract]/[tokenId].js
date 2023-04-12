@@ -6,6 +6,7 @@ import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import Alert from "@/components/Alert";
+import Chart from "@/components/PriceChart";
 
 export default function Nft() {
   const {
@@ -56,6 +57,17 @@ export default function Nft() {
       )
     : null;
 
+  // const alltransactions = data ? data.boughtNFTs : null;
+  // console.log("a", alltransactions);
+
+  const transactionsArr = data
+    ? data.boughtNFTs.filter(
+        (transaction) =>
+          transaction.nftContractAddr === collectionContract &&
+          transaction.tokenId === tokenId
+      )
+    : null;
+
   useEffect(() => {
     const calculateRarity = async (listings) => {
       const _theNftContract = [nftContract, nft2Contract].find(
@@ -88,16 +100,6 @@ export default function Nft() {
     }
   }, []);
 
-  const convertAddress = (addr) => {
-    return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
-  };
-
-  const showSeller = !seller
-    ? ""
-    : seller === walletAddress
-    ? "You"
-    : convertAddress(seller);
-
   useEffect(() => {
     const getNftUri = async () => {
       const _theNftContract = [nftContract, nft2Contract].find(
@@ -129,6 +131,16 @@ export default function Nft() {
       getNftUri();
     }
   }, []);
+
+  const convertAddress = (addr) => {
+    return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
+  };
+
+  const showSeller = !seller
+    ? ""
+    : seller === walletAddress
+    ? "You"
+    : convertAddress(seller);
 
   const totalPrice = price
     ? (
@@ -200,13 +212,17 @@ export default function Nft() {
           </button>
         </div>
         <div className={styles.nftInfoRight}>
-          <div className={styles.nftInfoRightItem}>
-            <p className={styles.nftInfoRightItemText}>Name</p>
-            <div className={styles.nftDescriptionContainer}>{name}</div>
-          </div>
-          <div className={styles.nftInfoRightItem}>
-            <p className={styles.nftInfoRightItemText}>Description</p>
-            <div className={styles.nftDescriptionContainer}>{description}</div>
+          <div className="flex flex-row">
+            <div className={styles.nftInfoRightItem}>
+              <p className={styles.nftInfoRightItemText}>Name</p>
+              <div className={styles.nftDescriptionContainer}>{name}</div>
+            </div>
+            <div className={styles.nftInfoRightItem}>
+              <p className={styles.nftInfoRightItemText}>Description</p>
+              <div className={styles.nftDescriptionContainer}>
+                {description}
+              </div>
+            </div>
           </div>
           <div className={styles.nftInfoRightItem}>
             <p className={styles.nftInfoRightItemText}>
@@ -239,6 +255,12 @@ export default function Nft() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+          <div className={styles.nftInfoRightItem}>
+            <p className={styles.nftInfoRightItemText}>Price History</p>
+            <div className={styles.nftChartContainer}>
+              <Chart transactions={transactionsArr} tokenId={tokenId} />
             </div>
           </div>
         </div>

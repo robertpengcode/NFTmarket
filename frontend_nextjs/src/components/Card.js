@@ -9,10 +9,10 @@ export default function Card({
   tokenId,
   seller,
   totalPrice,
-  walletAddress,
   nftContractAddr,
 }) {
-  const { contract, setShowAlert, setUpdateUI } = useGlobalContext();
+  const { contract, setShowAlert, setUpdateUI, walletAddress } =
+    useGlobalContext();
 
   const convertAddress = (addr) => {
     return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
