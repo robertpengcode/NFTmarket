@@ -49,6 +49,11 @@ export default function Card({
         });
       } catch (error) {
         console.log(error);
+        setShowAlert({
+          status: true,
+          type: "failure",
+          message: `Something went wrong.`,
+        });
       }
     }
   };

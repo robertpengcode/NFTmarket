@@ -145,6 +145,11 @@ export default function SellNFT() {
         });
       } catch (error) {
         console.log(error);
+        setShowAlert({
+          status: true,
+          type: "failure",
+          message: `Something went wrong.`,
+        });
       }
     }
   };
@@ -177,6 +182,11 @@ export default function SellNFT() {
         });
       } catch (error) {
         console.log(error);
+        setShowAlert({
+          status: true,
+          type: "failure",
+          message: `Something went wrong.`,
+        });
       }
     }
   };
@@ -212,6 +222,11 @@ export default function SellNFT() {
         );
       } catch (error) {
         console.log(error);
+        setShowAlert({
+          status: true,
+          type: "failure",
+          message: `Something went wrong.`,
+        });
       }
     }
   };
@@ -237,6 +252,11 @@ export default function SellNFT() {
         });
       } catch (error) {
         console.log(error);
+        setShowAlert({
+          status: true,
+          type: "failure",
+          message: `Something went wrong.`,
+        });
       }
     }
   };

@@ -57,9 +57,6 @@ export default function Nft() {
       )
     : null;
 
-  // const alltransactions = data ? data.boughtNFTs : null;
-  // console.log("a", alltransactions);
-
   const transactionsArr = data
     ? data.boughtNFTs.filter(
         (transaction) =>
@@ -72,7 +69,6 @@ export default function Nft() {
     const calculateRarity = async (listings) => {
       const _theNftContract = [nftContract, nft2Contract].find(
         (_nftContract) =>
-          //_nftContract.target.toLowerCase() === collection.nftContractAddr
           _nftContract.target.toLowerCase() === collectionContract
       );
       const result = {};
@@ -106,7 +102,6 @@ export default function Nft() {
       const _theNftContract = [nftContract, nft2Contract].find(
         (_nftContract) =>
           _nftContract.target.toLowerCase() === collectionContract
-        //_nftContract.target.toLowerCase() === collection.nftContractAddr
       );
       setTheNftContract(_theNftContract);
 
@@ -185,6 +180,11 @@ export default function Nft() {
         });
       } catch (error) {
         console.log(error);
+        setShowAlert({
+          status: true,
+          type: "failure",
+          message: `Something went wrong.`,
+        });
       }
     }
   };

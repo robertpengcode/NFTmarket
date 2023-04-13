@@ -32,7 +32,7 @@ export default function OwnerWithdraw() {
   const showContractAddress = contract ? convertAddress(contract.target) : "";
 
   const updateAccountBalance = async () => {
-    console.log("not call?");
+    //console.log("not call?");
     const balance = (await provider.getBalance(walletAddress)).toString();
     const balanceInETH = ethers.formatEther(balance);
     setWalletBalance(balanceInETH);
@@ -40,6 +40,7 @@ export default function OwnerWithdraw() {
 
   const handleOwnerWithdraw = async () => {
     const withdrawInWei = ethers.parseEther(withdrawAmount);
+    //console.log("c", contract);
     if (contract) {
       try {
         const answer = await contract.ownerWithdrawFee(withdrawInWei);
@@ -63,6 +64,11 @@ export default function OwnerWithdraw() {
         });
       } catch (error) {
         console.log(error);
+        setShowAlert({
+          status: true,
+          type: "failure",
+          message: `Something went wrong.`,
+        });
       }
     }
   };
