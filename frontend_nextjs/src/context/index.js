@@ -19,6 +19,7 @@ export const GlobalContextProvider = ({ children }) => {
     message: "",
   });
   const [updateUI, setUpdateUI] = useState(false);
+  const [attributesCount, setAttributesCount] = useState({});
 
   //* Handle alerts
   useEffect(() => {
@@ -132,6 +133,10 @@ export const GlobalContextProvider = ({ children }) => {
     }
   };
 
+  const convertAddress = (addr) => {
+    return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
+  };
+
   useEffect(() => {
     if (window.ethereum && window.localStorage.getItem("connected")) {
       restore();
@@ -161,6 +166,9 @@ export const GlobalContextProvider = ({ children }) => {
         showAlert,
         setShowAlert,
         updateUI,
+        convertAddress,
+        attributesCount,
+        setAttributesCount,
       }}
     >
       {children}

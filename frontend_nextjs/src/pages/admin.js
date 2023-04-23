@@ -7,11 +7,11 @@ import Alert from "@/components/Alert";
 export default function Admin() {
   const {
     contract,
-    walletAddress,
     isAdmin,
     showAlert,
     setShowAlert,
     setUpdateUI,
+    convertAddress,
   } = useGlobalContext();
   const [selectTabId, setSelectTabId] = useState("0");
   const [collectionName, setCollectionName] = useState("");
@@ -38,10 +38,6 @@ export default function Admin() {
   const [maxSupply, setMaxSupply] = useState("");
   const [team, setTeam] = useState("");
   const [collectionJason, setCollectionJason] = useState("");
-
-  const convertAddress = (addr) => {
-    return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
-  };
 
   const handleTab = (e) => {
     setSelectTabId(e.target.id);

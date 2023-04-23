@@ -9,12 +9,12 @@ import Alert from "@/components/Alert";
 export default function SellNFT() {
   const {
     contract,
-    walletAddress,
     nftContract,
     nft2Contract,
     showAlert,
     setShowAlert,
     setUpdateUI,
+    convertAddress,
   } = useGlobalContext();
   const { loading, error, data } = useSubgraph();
   const [collectionName, setCollectionName] = useState("");
@@ -26,25 +26,7 @@ export default function SellNFT() {
   const [collectionAddrsArr, setCollectionAddrsArr] = useState([]);
   const [theNftContract, setTheNftContract] = useState(null);
 
-  const convertAddress = (addr) => {
-    return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
-  };
-
   const collectionsArr = data ? data.createdCollections : null;
-
-  // async function updateUI() {
-  //   const _collectionNamesArr = [];
-  //   const _collectionAddrsArr = [];
-  //   for (let i = 0; i < collectionsArr.length; i++) {
-  //     const response = await (
-  //       await fetch(collectionsArr[i].collectionURI)
-  //     ).json();
-  //     _collectionNamesArr.push(response.name);
-  //     _collectionAddrsArr.push(collectionsArr[i].nftContractAddr);
-  //   }
-  //   setCollectionNamesArr(_collectionNamesArr);
-  //   setCollectionAddrsArr(_collectionAddrsArr);
-  // }
 
   useEffect(() => {
     const updateUI = async () => {

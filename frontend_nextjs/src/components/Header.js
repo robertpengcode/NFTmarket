@@ -8,8 +8,14 @@ import logo from "../../public/kidsLogo.svg";
 import matic from "../../public/matic.svg";
 
 export default function Header() {
-  const { contract, walletAddress, walletBalance, connectWallet, isAdmin } =
-    useGlobalContext();
+  const {
+    contract,
+    walletAddress,
+    walletBalance,
+    connectWallet,
+    isAdmin,
+    convertAddress,
+  } = useGlobalContext();
   const { route } = useRouter();
   const [selectTabId, setSelectTabId] = useState("0");
 
@@ -21,9 +27,6 @@ export default function Header() {
     setSelectTabId("2");
   }
 
-  const convertAddress = (addr) => {
-    return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
-  };
   const showWalletAddress = walletAddress ? convertAddress(walletAddress) : "";
 
   const handleConnect = async () => {

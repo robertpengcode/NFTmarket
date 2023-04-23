@@ -17,11 +17,12 @@ export default function Nft() {
     showAlert,
     setShowAlert,
     setUpdateUI,
+    convertAddress,
+    attributesCount,
   } = useGlobalContext();
   const { loading, error, data } = useSubgraph();
   const router = useRouter();
   const { collectionContract, tokenId } = router.query;
-  const [attributesCount, setAttributesCount] = useState(null);
   const [theNftContract, setTheNftContract] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -66,38 +67,6 @@ export default function Nft() {
     : null;
 
   useEffect(() => {
-    const calculateRarity = async (listings) => {
-      const _theNftContract = [nftContract, nft2Contract].find(
-        (_nftContract) =>
-          _nftContract.target.toLowerCase() === collectionContract
-      );
-      const result = {};
-      for (let i = 0; i < listings.length; i++) {
-        const nftURI = await _theNftContract.tokenURI(
-          listings[i].tokenId.toString()
-        );
-        const { attributes } = await (await fetch(nftURI)).json();
-        for (let j = 0; j < attributes.length; j++) {
-          const { trait_type, value } = attributes[j];
-          if (trait_type in result) {
-            if (value in result[trait_type]) {
-              result[trait_type][value] += 1;
-            } else {
-              result[trait_type][value] = 1;
-            }
-          } else {
-            result[trait_type] = { [value]: 1 };
-          }
-        }
-      }
-      setAttributesCount(result);
-    };
-    if (listingsArr) {
-      calculateRarity(listingsArr);
-    }
-  }, [collectionContract, listingsArr, nft2Contract, nftContract]);
-
-  useEffect(() => {
     const getNftUri = async () => {
       const _theNftContract = [nftContract, nft2Contract].find(
         (_nftContract) =>
@@ -135,10 +104,6 @@ export default function Nft() {
     nftContract,
     tokenId,
   ]);
-
-  const convertAddress = (addr) => {
-    return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
-  };
 
   const showSeller = !seller
     ? ""
@@ -247,20 +212,20 @@ export default function Nft() {
                     {attribute.value}
                   </div>
                   <div className={styles.nftAttributeRare}>
-                    {!attributesCount ? (
-                      <span>0</span>
+                    {!Object.keys(attributesCount).length ? (
+                      <span>N/A</span>
                     ) : (
                       <span>
                         {Math.round(
-                          (attributesCount[attribute.trait_type][
-                            attribute.value
-                          ] *
+                          (attributesCount[collectionContract][
+                            attribute.trait_type
+                          ][attribute.value] *
                             100) /
                             listingsArr.length
                         )}
+                        % have this trait
                       </span>
                     )}
-                    <span>% have this trait</span>
                   </div>
                 </div>
               ))}

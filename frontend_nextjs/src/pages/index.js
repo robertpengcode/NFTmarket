@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import styles from "@/styles";
 import { useGlobalContext } from "../context";
 import { useSubgraph } from "@/hooks/subgraph";
@@ -7,7 +7,8 @@ import Spinner from "@/components/Spinner";
 import Head from "next/head";
 
 export default function Home() {
-  const { updateUI } = useGlobalContext();
+  const { updateUI, setAttributesCount, nftContract, nft2Contract } =
+    useGlobalContext();
   const { loading, error, data, refetch } = useSubgraph();
 
   const collectionsArr = data ? data.createdCollections : null;
@@ -17,6 +18,48 @@ export default function Home() {
   useEffect(() => {
     refetch();
   }, [updateUI, refetch]);
+
+  //for each collection: calculate current listing nfts' attributes
+  //and set the attributes object to the context
+  useEffect(() => {
+    const calculateAttributes = async (collections, listings) => {
+      const _attributesCount = {};
+      for (let k = 0; k < collections.length; k++) {
+        const _collectionAddr = collections[k].nftContractAddr;
+        const _listings = listings.filter(
+          (listing) => listing.nftContractAddr === _collectionAddr
+        );
+        const _theNftContract = [nftContract, nft2Contract].find(
+          (_nftContract) =>
+            _nftContract.target.toLowerCase() === _collectionAddr
+        );
+        const attributesObj = {};
+        for (let i = 0; i < _listings.length; i++) {
+          const nftURI = await _theNftContract.tokenURI(
+            _listings[i].tokenId.toString()
+          );
+          const { attributes } = await (await fetch(nftURI)).json();
+          for (let j = 0; j < attributes.length; j++) {
+            const { trait_type, value } = attributes[j];
+            if (trait_type in attributesObj) {
+              if (value in attributesObj[trait_type]) {
+                attributesObj[trait_type][value] += 1;
+              } else {
+                attributesObj[trait_type][value] = 1;
+              }
+            } else {
+              attributesObj[trait_type] = { [value]: 1 };
+            }
+          }
+        }
+        _attributesCount[_collectionAddr] = attributesObj;
+      }
+      setAttributesCount(_attributesCount);
+    };
+    if (collectionsArr && listingsArr) {
+      calculateAttributes(collectionsArr, listingsArr);
+    }
+  }, [listingsArr, nft2Contract, nftContract]);
 
   return (
     <>

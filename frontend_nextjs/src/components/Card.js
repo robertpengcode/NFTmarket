@@ -11,12 +11,8 @@ export default function Card({
   totalPrice,
   nftContractAddr,
 }) {
-  const { contract, setShowAlert, setUpdateUI, walletAddress } =
+  const { contract, setShowAlert, setUpdateUI, walletAddress, convertAddress } =
     useGlobalContext();
-
-  const convertAddress = (addr) => {
-    return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
-  };
 
   const showSellerAddress = !seller
     ? ""
@@ -68,6 +64,7 @@ export default function Card({
             alt={tokenId}
             width={200}
             height={200}
+            priority={true}
           />
         )}
       </Link>

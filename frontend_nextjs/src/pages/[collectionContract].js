@@ -8,15 +8,7 @@ import Listing from "@/components/Listing";
 import Alert from "@/components/Alert";
 
 export default function Listings() {
-  const {
-    contract,
-    walletAddress,
-    provider,
-    nftContract,
-    nft2Contract,
-    showAlert,
-    setShowAlert,
-  } = useGlobalContext();
+  const { contract, nftContract, nft2Contract, showAlert } = useGlobalContext();
   const { loading, error, data } = useSubgraph();
   const router = useRouter();
   const { collectionContract } = router.query;

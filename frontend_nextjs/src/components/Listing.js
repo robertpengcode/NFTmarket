@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGlobalContext } from "../context";
 import Card from "../components/Card";
 
@@ -12,19 +12,28 @@ export default function Listing({
   const { walletAddress } = useGlobalContext();
   const [nftImgURL, setNftImgURL] = useState("");
   const [showNFT, setShowNFT] = useState(true);
+  const [attributes, setAttributes] = useState([]);
 
   const { nftContractAddr, tokenId, seller, price } = listing;
 
   const getNftUri = async () => {
     const nftURI = await nftContract.tokenURI(tokenId.toString());
     const response = await (await fetch(nftURI)).json();
-    setShowNFT(checkAttributes(response.attributes));
+    setAttributes(response.attributes);
     setNftImgURL(response.image);
   };
 
-  if (nftContract && tokenId) {
-    getNftUri();
-  }
+  useEffect(() => {
+    if (nftContract && tokenId) {
+      getNftUri();
+    }
+  }, [nftContract]);
+
+  useEffect(() => {
+    if (nftContract && tokenId) {
+      setShowNFT(checkAttributes(attributes));
+    }
+  }, [nftContract, selectedAttributes]);
 
   //to determine show this NFT or not
   function checkAttributes(attributesArr) {

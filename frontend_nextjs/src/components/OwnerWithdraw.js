@@ -4,8 +4,14 @@ import { useGlobalContext } from "../context";
 import { ethers } from "ethers";
 
 export default function OwnerWithdraw() {
-  const { contract, walletAddress, setShowAlert, provider, setWalletBalance } =
-    useGlobalContext();
+  const {
+    contract,
+    walletAddress,
+    setShowAlert,
+    provider,
+    setWalletBalance,
+    convertAddress,
+  } = useGlobalContext();
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [contractBalance, setContractBalance] = useState("");
   const [ownerBalance, setOwnerBalance] = useState("");
@@ -25,14 +31,10 @@ export default function OwnerWithdraw() {
     getBalance();
   }, [updateBalance, contract]);
 
-  const convertAddress = (addr) => {
-    return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
-  };
   const showWalletAddress = walletAddress ? convertAddress(walletAddress) : "";
   const showContractAddress = contract ? convertAddress(contract.target) : "";
 
   const updateAccountBalance = async () => {
-    //console.log("not call?");
     const balance = (await provider.getBalance(walletAddress)).toString();
     const balanceInETH = ethers.formatEther(balance);
     setWalletBalance(balanceInETH);
@@ -40,7 +42,6 @@ export default function OwnerWithdraw() {
 
   const handleOwnerWithdraw = async () => {
     const withdrawInWei = ethers.parseEther(withdrawAmount);
-    //console.log("c", contract);
     if (contract) {
       try {
         const answer = await contract.ownerWithdrawFee(withdrawInWei);

@@ -4,8 +4,14 @@ import { useGlobalContext } from "../context";
 import { ethers } from "ethers";
 
 export default function UserWithdraw() {
-  const { contract, walletAddress, setShowAlert, provider, setWalletBalance } =
-    useGlobalContext();
+  const {
+    contract,
+    walletAddress,
+    setShowAlert,
+    provider,
+    setWalletBalance,
+    convertAddress,
+  } = useGlobalContext();
   const [userBalance, setUserBalance] = useState("");
   const [updateBalance, setUpdateBalance] = useState(false);
 
@@ -21,9 +27,6 @@ export default function UserWithdraw() {
     getUserBalance();
   }, [updateBalance, walletAddress, contract]);
 
-  const convertAddress = (addr) => {
-    return addr.slice(0, 5) + "..." + addr.slice(addr.length - 4);
-  };
   const showWalletAddress = walletAddress ? convertAddress(walletAddress) : "";
 
   const updateAccountBalance = async () => {

@@ -30,16 +30,6 @@ export default function CollectionRow({ collection, listingsArr }) {
     }
   }, [listingsArr]);
 
-  // async function updateUI() {
-  //   if (collectionURI) {
-  //     const response = await (await fetch(collectionURI)).json();
-  //     setName(response.name);
-  //     setUrl(response.iconURL);
-  //     setTeam(response.team);
-  //     setMaxSupply(response.maxSupply);
-  //   }
-  // }
-
   useEffect(() => {
     const updateUI = async () => {
       if (collectionURI) {
