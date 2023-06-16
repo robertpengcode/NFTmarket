@@ -5,6 +5,11 @@ import { useSubgraph } from "@/hooks/subgraph";
 import CollectionRow from "../components/CollectionRow";
 import Spinner from "@/components/Spinner";
 import Head from "next/head";
+import { Contract } from "ethers";
+
+// export default function Home() {
+//   return <div>chichi</div>;
+// }
 
 export default function Home() {
   const { updateUI, setAttributesCount, nftContract, nft2Contract } =
@@ -31,8 +36,11 @@ export default function Home() {
         );
         const _theNftContract = [nftContract, nft2Contract].find(
           (_nftContract) =>
-            _nftContract.target.toLowerCase() === _collectionAddr
+            //ethers.js v6
+            //_nftContract.target.toLowerCase() === _collectionAddr
+            _nftContract.address.toLowerCase() === _collectionAddr
         );
+        //const _theNftContract = nftContract;
         const attributesObj = {};
         for (let i = 0; i < _listings.length; i++) {
           const nftURI = await _theNftContract.tokenURI(

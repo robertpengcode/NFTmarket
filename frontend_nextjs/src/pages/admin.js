@@ -12,6 +12,7 @@ export default function Admin() {
     setShowAlert,
     setUpdateUI,
     convertAddress,
+    signer,
   } = useGlobalContext();
   const [selectTabId, setSelectTabId] = useState("0");
   const [collectionName, setCollectionName] = useState("");
@@ -105,12 +106,14 @@ export default function Admin() {
   const createCollection = async () => {
     if (contract) {
       try {
-        const answer = await contract.createCollection(
-          collectionAddr,
-          royaltyAddr,
-          royaltyPercent,
-          collectionURL
-        );
+        const answer = await contract
+          .connect(signer)
+          .createCollection(
+            collectionAddr,
+            royaltyAddr,
+            royaltyPercent,
+            collectionURL
+          );
         if (answer) {
           setShowAlert({
             status: true,
@@ -126,7 +129,7 @@ export default function Admin() {
               nftContractAddr
             )}) is created.`,
           });
-          setUpdateUI((pre) => !pre);
+          //setUpdateUI((pre) => !pre);
         });
       } catch (error) {
         console.log(error);
@@ -142,12 +145,14 @@ export default function Admin() {
   const updateCollection = async () => {
     if (contract) {
       try {
-        const answer = await contract.updateCollection(
-          collectionAddr,
-          royaltyAddr,
-          royaltyPercent,
-          collectionURL
-        );
+        const answer = await contract
+          .connect(signer)
+          .updateCollection(
+            collectionAddr,
+            royaltyAddr,
+            royaltyPercent,
+            collectionURL
+          );
         if (answer) {
           setShowAlert({
             status: true,
@@ -163,7 +168,7 @@ export default function Admin() {
               nftContractAddr
             )}) is updated.`,
           });
-          setUpdateUI((pre) => !pre);
+          //setUpdateUI((pre) => !pre);
         });
       } catch (error) {
         console.log(error);
@@ -179,7 +184,9 @@ export default function Admin() {
   const deleteCollection = async () => {
     if (contract) {
       try {
-        const answer = await contract.deleteCollection(collectionAddr);
+        const answer = await contract
+          .connect(signer)
+          .deleteCollection(collectionAddr);
         if (answer) {
           setShowAlert({
             status: true,
@@ -195,7 +202,7 @@ export default function Admin() {
               nftContractAddr
             )}) is delected.`,
           });
-          setUpdateUI((pre) => !pre);
+          //setUpdateUI((pre) => !pre);
         });
       } catch (error) {
         console.log(error);

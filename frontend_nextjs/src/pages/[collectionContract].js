@@ -48,7 +48,9 @@ export default function Listings() {
       if (nftContract && nft2Contract) {
         const _theNftContract = [nftContract, nft2Contract].find(
           (_nftContract) =>
-            _nftContract.target.toLowerCase() === collectionContract
+            //ethers.js v6
+            //_nftContract.target.toLowerCase() === collectionContract
+            _nftContract.address.toLowerCase() === collectionContract
         );
         setTheNftContract(_theNftContract);
       }

@@ -27,7 +27,7 @@ export default function PriceChart({ transactions, tokenId }) {
       {
         label: `Token #${tokenId} Price (MATIC)`,
         data: transactions
-          ? transactions.map((tran) => ethers.formatEther(tran.price))
+          ? transactions.map((tran) => ethers.utils.formatEther(tran.price))
           : [],
         borderColor: "rgb(255, 99, 132)",
         backgroundColor: "rgba(255, 99, 132, 0.5)",

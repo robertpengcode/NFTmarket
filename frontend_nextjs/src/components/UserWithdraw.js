@@ -8,9 +8,10 @@ export default function UserWithdraw() {
     contract,
     walletAddress,
     setShowAlert,
-    provider,
+    walletProvider,
     setWalletBalance,
     convertAddress,
+    signer,
   } = useGlobalContext();
   const [userBalance, setUserBalance] = useState("");
   const [updateBalance, setUpdateBalance] = useState(false);
@@ -30,15 +31,15 @@ export default function UserWithdraw() {
   const showWalletAddress = walletAddress ? convertAddress(walletAddress) : "";
 
   const updateAccountBalance = async () => {
-    const balance = (await provider.getBalance(walletAddress)).toString();
-    const balanceInETH = ethers.formatEther(balance);
+    const balance = (await walletProvider.getBalance(walletAddress)).toString();
+    const balanceInETH = ethers.utils.formatEther(balance);
     setWalletBalance(balanceInETH);
   };
 
   const handleUserWithdraw = async () => {
     if (contract) {
       try {
-        const answer = await contract.usersWithdraw();
+        const answer = await contract.connect(signer).usersWithdraw();
         if (answer) {
           setShowAlert({
             status: true,
@@ -52,7 +53,7 @@ export default function UserWithdraw() {
             type: "success",
             message: `User (${convertAddress(
               user
-            )}) withdrew ${ethers.formatEther(amount)} MATIC.`,
+            )}) withdrew ${ethers.utils.formatEther(amount)} MATIC.`,
           });
           setUpdateBalance((pre) => !pre);
           updateAccountBalance();
@@ -81,7 +82,7 @@ export default function UserWithdraw() {
           User({showWalletAddress}) Proceed in the Contract:{" "}
         </p>
         <p className={styles.sellFormLabel}>
-          {userBalance ? ethers.formatEther(userBalance) : ""} MATIC
+          {userBalance ? ethers.utils.formatEther(userBalance) : ""} MATIC
         </p>
       </div>
 

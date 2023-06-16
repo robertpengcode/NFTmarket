@@ -11,8 +11,14 @@ export default function Card({
   totalPrice,
   nftContractAddr,
 }) {
-  const { contract, setShowAlert, setUpdateUI, walletAddress, convertAddress } =
-    useGlobalContext();
+  const {
+    contract,
+    setShowAlert,
+    setUpdateUI,
+    walletAddress,
+    convertAddress,
+    signer,
+  } = useGlobalContext();
 
   const showSellerAddress = !seller
     ? ""
@@ -23,9 +29,11 @@ export default function Card({
   const handleBuy = async () => {
     if (contract) {
       try {
-        const answer = await contract.buyNFT(nftContractAddr, tokenId, {
-          value: totalPrice,
-        });
+        const answer = await contract
+          .connect(signer)
+          .buyNFT(nftContractAddr, tokenId, {
+            value: totalPrice,
+          });
         if (answer) {
           setShowAlert({
             status: true,
@@ -41,7 +49,7 @@ export default function Card({
               buyer
             )}).`,
           });
-          setUpdateUI((pre) => !pre);
+          //setUpdateUI((pre) => !pre);
         });
       } catch (error) {
         console.log(error);
@@ -71,7 +79,10 @@ export default function Card({
 
       <p className={styles.cardText}>#{tokenId}</p>
       <p className={styles.cardText}>Owned By {showSellerAddress}</p>
-      <p className={styles.cardText}>{ethers.formatEther(totalPrice)} MATIC</p>
+      {/* <p className={styles.cardText}>{ethers.formatEther(totalPrice)} MATIC</p> */}
+      <p className={styles.cardText}>
+        {ethers.utils.formatEther(totalPrice)} MATIC
+      </p>
       <button
         className={styles.cardButton}
         disabled={seller === walletAddress}

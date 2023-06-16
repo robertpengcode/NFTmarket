@@ -20,7 +20,9 @@ export default function CollectionRow({ collection, listingsArr }) {
         return;
       }
       const arr = listings.map((listing) =>
-        Number(ethers.formatEther(listing.price))
+        //ethers.js v6
+        //Number(ethers.formatEther(listing.price))
+        Number(ethers.utils.formatEther(listing.price))
       );
       const _floor = Math.min(...arr).toString();
       setFloor(_floor);

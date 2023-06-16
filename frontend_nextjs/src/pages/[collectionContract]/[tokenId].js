@@ -19,6 +19,7 @@ export default function Nft() {
     setUpdateUI,
     convertAddress,
     attributesCount,
+    signer,
   } = useGlobalContext();
   const { loading, error, data } = useSubgraph();
   const router = useRouter();
@@ -70,7 +71,9 @@ export default function Nft() {
     const getNftUri = async () => {
       const _theNftContract = [nftContract, nft2Contract].find(
         (_nftContract) =>
-          _nftContract.target.toLowerCase() === collectionContract
+          // ethers.js v6
+          // _nftContract.target.toLowerCase() === collectionContract
+          _nftContract.address.toLowerCase() === collectionContract
       );
       setTheNftContract(_theNftContract);
 
@@ -118,14 +121,16 @@ export default function Nft() {
       ).toString()
     : "";
 
-  const showPrice = totalPrice ? ethers.formatEther(totalPrice) : "";
+  const showPrice = totalPrice ? ethers.utils.formatEther(totalPrice) : "";
 
   const handleBuy = async () => {
     if (contract) {
       try {
-        const answer = await contract.buyNFT(nftContractAddr, tokenId, {
-          value: totalPrice,
-        });
+        const answer = await contract
+          .connect(signer)
+          .buyNFT(nftContractAddr, tokenId, {
+            value: totalPrice,
+          });
         if (answer) {
           setShowAlert({
             status: true,
@@ -141,7 +146,7 @@ export default function Nft() {
               buyer
             )}).`,
           });
-          setUpdateUI((pre) => !pre);
+          //setUpdateUI((pre) => !pre);
         });
       } catch (error) {
         console.log(error);

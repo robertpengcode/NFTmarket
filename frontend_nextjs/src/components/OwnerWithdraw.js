@@ -8,9 +8,10 @@ export default function OwnerWithdraw() {
     contract,
     walletAddress,
     setShowAlert,
-    provider,
+    walletProvider,
     setWalletBalance,
     convertAddress,
+    signer,
   } = useGlobalContext();
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [contractBalance, setContractBalance] = useState("");
@@ -32,19 +33,24 @@ export default function OwnerWithdraw() {
   }, [updateBalance, contract]);
 
   const showWalletAddress = walletAddress ? convertAddress(walletAddress) : "";
-  const showContractAddress = contract ? convertAddress(contract.target) : "";
+  //ethers.js v6
+  //const showContractAddress = contract ? convertAddress(contract.target) : "";
+  const showContractAddress = contract ? convertAddress(contract.address) : "";
 
   const updateAccountBalance = async () => {
-    const balance = (await provider.getBalance(walletAddress)).toString();
-    const balanceInETH = ethers.formatEther(balance);
+    //const balance = (await provider.getBalance(walletAddress)).toString();
+    const balance = (await walletProvider.getBalance(walletAddress)).toString();
+    const balanceInETH = ethers.utils.formatEther(balance);
     setWalletBalance(balanceInETH);
   };
 
   const handleOwnerWithdraw = async () => {
-    const withdrawInWei = ethers.parseEther(withdrawAmount);
+    const withdrawInWei = ethers.utils.parseEther(withdrawAmount);
     if (contract) {
       try {
-        const answer = await contract.ownerWithdrawFee(withdrawInWei);
+        const answer = await contract
+          .connect(signer)
+          .ownerWithdrawFee(withdrawInWei);
         if (answer) {
           setShowAlert({
             status: true,
@@ -58,10 +64,11 @@ export default function OwnerWithdraw() {
             type: "success",
             message: `User (${convertAddress(
               owner
-            )}) withdrew ${ethers.formatEther(amount)} MATIC.`,
+            )}) withdrew ${ethers.utils.formatEther(amount)} MATIC.`,
           });
-          setUpdateBalance((pre) => !pre);
+          setUpdateBalance(!updateBalance);
           updateAccountBalance();
+          setWithdrawAmount("");
         });
       } catch (error) {
         console.log(error);
@@ -87,7 +94,8 @@ export default function OwnerWithdraw() {
           Contract({showContractAddress}) Balance:{" "}
         </p>
         <p className={styles.sellFormLabel}>
-          {contractBalance ? ethers.formatEther(contractBalance) : ""} MATIC
+          {contractBalance ? ethers.utils.formatEther(contractBalance) : ""}{" "}
+          MATIC
         </p>
       </div>
       <div className="flex flex-row my-1">
@@ -95,7 +103,7 @@ export default function OwnerWithdraw() {
           Owner({showWalletAddress}) Balance in the Contract:{" "}
         </p>
         <p className={styles.sellFormLabel}>
-          {ownerBalance ? ethers.formatEther(ownerBalance) : ""} MATIC
+          {ownerBalance ? ethers.utils.formatEther(ownerBalance) : ""} MATIC
         </p>
       </div>
 
